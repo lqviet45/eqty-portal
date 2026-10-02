@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/lib/api/errors';
 import { ledgerVersionOf } from '@/lib/api/hooks';
 import { errorFor, failedFieldErrors } from '@/lib/checks';
+import { isPlatformAdmin } from '@/lib/auth/roles';
 import { parseConfig } from '@/lib/config';
 import { describeCode, describeError } from '@/lib/i18n';
 import { describeEntry, groupOf } from '@/lib/ledger/describe';
@@ -20,8 +21,20 @@ describe('runtime config', () => {
       oidcAuthority: 'https://auth.x/realms/eqty',
       oidcClientId: 'eqty-portal',
       apiBaseUrl: 'https://api.x',
+      monitorUrl: '',
     });
     expect(parseConfig({ oidcAuthority: 'a', oidcClientId: 'b' }).apiBaseUrl).toBe('');
+  });
+
+  it('reads the monitoring address and drops a trailing slash', () => {
+    const base = { oidcAuthority: 'a', oidcClientId: 'b' };
+    expect(parseConfig({ ...base, monitorUrl: 'https://monitor.x/' }).monitorUrl).toBe('https://monitor.x');
+    expect(parseConfig({ ...base, monitorUrl: '' }).monitorUrl).toBe('');
+    expect(parseConfig(base).monitorUrl).toBe('');
+  });
+
+  it.each([3, 'monitor.x', 'javascript:alert(1)', 'https://', '//monitor.x'])('rejects monitorUrl %j', (monitorUrl) => {
+    expect(() => parseConfig({ oidcAuthority: 'a', oidcClientId: 'b', monitorUrl })).toThrow();
   });
 
   it.each([null, 'x', {}, { oidcAuthority: 'a' }, { oidcAuthority: 'a', oidcClientId: 'b', apiBaseUrl: 3 }])(
@@ -50,6 +63,11 @@ describe('routes', () => {
     expect(ROUTE_ROLES.portfolio).toContain('EMPLOYEE');
   });
 
+  it('shows the monitoring screen by the platform-admin role, not by a company role', () => {
+    expect(companyHref('monitor', 'abc')).toBe('/monitor/?c=abc');
+    expect('monitor' in ROUTE_ROLES).toBe(false);
+  });
+
   it('only follows in-app paths after sign-in', () => {
     expect(safeReturnTo('/invite/?companyId=1&token=2')).toBe('/invite/?companyId=1&token=2');
     expect(safeReturnTo('//evil.example')).toBe('/');
@@ -57,6 +75,19 @@ describe('routes', () => {
     expect(safeReturnTo('/\\evil')).toBe('/');
     expect(safeReturnTo(undefined)).toBe('/');
   });
+});
+
+describe('platform-admin role', () => {
+  it('is read from the roles claim of the ID token', () => {
+    expect(isPlatformAdmin({ roles: ['offline_access', 'platform-admin'] })).toBe(true);
+  });
+
+  it.each([{}, { roles: [] }, { roles: ['platform-administrator'] }, { roles: 'platform-admin' }, { roles: null }])(
+    'is not granted by %j',
+    (profile) => {
+      expect(isPlatformAdmin(profile)).toBe(false);
+    },
+  );
 });
 
 describe('preview checks', () => {

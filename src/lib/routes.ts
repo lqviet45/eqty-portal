@@ -13,6 +13,7 @@ export const ROUTES = {
   members: '/members/',
   settings: '/settings/',
   portfolio: '/portfolio/',
+  monitor: '/monitor/',
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
@@ -36,12 +37,15 @@ export function companyHref(
   return `${ROUTES[route]}?${search.toString()}`;
 }
 
+/** Screens a company role decides. The monitoring screen is not one of them: it follows the platform-admin role of the account. */
+export type CompanyRoute = Exclude<RouteKey, 'monitor'>;
+
 const ADMINS: CompanyRole[] = ['OWNER', 'ADMIN'];
 const LEDGER_READERS: CompanyRole[] = ['OWNER', 'ADMIN', 'VIEWER'];
 const EVERYONE: CompanyRole[] = ['OWNER', 'ADMIN', 'VIEWER', 'EMPLOYEE'];
 
 /** Which roles see which screen. Mirrors AccessPolicy in the API, which enforces it; this only hides what would be refused. */
-export const ROUTE_ROLES: Record<RouteKey, readonly CompanyRole[]> = {
+export const ROUTE_ROLES: Record<CompanyRoute, readonly CompanyRole[]> = {
   dashboard: LEDGER_READERS,
   capTable: LEDGER_READERS,
   stakeholders: LEDGER_READERS,

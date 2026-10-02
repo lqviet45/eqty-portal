@@ -23,8 +23,9 @@ Quy chuẩn bắt buộc khi đóng góp: [`CLAUDE.md`](CLAUDE.md). Quy ước A
 | Thành viên & lời mời                      | `/members/`                      | Owner, Admin                            | `bff/members`             |
 | Nhập số dư từ Excel (chạy nền)            | `/import/`                       | Owner, Admin                            | `bff/import`              |
 | Cài đặt công ty                           | `/settings/`                     | Owner, Admin                            | `api/companies/{id}`      |
+| Giám sát hệ thống (liên kết)              | `/monitor/`                      | `platform-admin` (vai trò Keycloak)     | `monitorUrl` trong config |
 
-Mọi màn trong công ty có `?c=<companyId>`. Chưa làm: tiếng Anh (catalog `src/messages` chỉ có tiếng Việt, thêm ngôn ngữ là thêm một catalog cùng hình dạng), màn xem và đưa lại job `DEAD` (backend chưa có).
+Mọi màn trong công ty có `?c=<companyId>`. Màn Giám sát chỉ hiện trong menu khi claim `roles` của ID token có `platform-admin`, và chỉ là liên kết mở dashboard của backend (`https://monitor.<domain>`) ở tab mới; dashboard tự kiểm tra lại vai trò. Địa chỉ đó là `monitorUrl` trong `config.json` (`EQTY_MONITOR_URL` lúc build, đã khai trong `vercel.json`). Chưa làm: tiếng Anh (catalog `src/messages` chỉ có tiếng Việt, thêm ngôn ngữ là thêm một catalog cùng hình dạng), màn xem và đưa lại job `DEAD` (backend chưa có).
 
 ## Cấu trúc
 
@@ -74,7 +75,7 @@ Trình duyệt: `EQTY_CHROMIUM_PATH` trỏ tới Chromium có sẵn; không đ�
 Import repo vào Vercel, không cần chỉnh cài đặt: `vercel.json` đã khai mọi thứ.
 
 - **Gọi thẳng API ở VPS**: `build.env.EQTY_API_BASE_URL` trong `vercel.json` là origin của backend; trình duyệt gọi `https://app.<domain>/api` và `/bff` trực tiếp (API cho phép CORS, xác thực bằng header `Authorization` chứ không dùng cookie). Không dùng rewrite của Vercel: với `trailingSlash` Vercel thêm dấu `/` vào đường dẫn API và chuyển hướng 308, làm mọi lệnh gọi thành 404 (đã gặp trên bản deploy thật).
-- **Cấu hình chạy**: `npm run build` chạy `scripts/write-runtime-config.mjs` ghi `public/config.json` từ `build.env` (`EQTY_OIDC_AUTHORITY`, `EQTY_OIDC_CLIENT_ID`, `EQTY_API_BASE_URL`). Không đặt biến thì giữ `config.json` của local.
+- **Cấu hình chạy**: `npm run build` chạy `scripts/write-runtime-config.mjs` ghi `public/config.json` từ `build.env` (`EQTY_OIDC_AUTHORITY`, `EQTY_OIDC_CLIENT_ID`, `EQTY_API_BASE_URL`). Không đặt biến thì giữ `config.json` của local. `EQTY_MONITOR_URL` (không bắt buộc) là địa chỉ trang giám sát, chỉ platform-admin thấy.
 - Header bảo mật và `Referrer-Policy: no-referrer` (URL lời mời chứa token dùng một lần) cũng nằm trong `vercel.json`.
 
 **Việc phải làm một lần trên VPS** (không phải code; script có sẵn trong eqty-engine-service):
@@ -90,7 +91,12 @@ Preview deployment của Vercel có URL ngẫu nhiên nên không đăng nhập 
 `npm run build` tạo `out/` toàn file tĩnh. Phục vụ nó **cùng origin** với `/api` và `/bff`, chép `out/` vào thư mục web và ghi `config.json` của môi trường đè lên `out/config.json` (không đưa vào git):
 
 ```json
-{ "oidcAuthority": "https://auth.example.vn/realms/eqty", "oidcClientId": "eqty-portal", "apiBaseUrl": "" }
+{
+  "oidcAuthority": "https://auth.example.vn/realms/eqty",
+  "oidcClientId": "eqty-portal",
+  "apiBaseUrl": "",
+  "monitorUrl": ""
+}
 ```
 
 Không cần sửa `try_files $uri /index.html` của backend: khi proxy trả trang chủ cho một đường dẫn không phải file (tải lại `/cap-table/`, `/invite?…`, `/auth/callback/?…`), trang chủ chuyển tới file của đường dẫn đó và giữ nguyên query (`src/lib/entryFallback.ts`).

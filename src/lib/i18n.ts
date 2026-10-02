@@ -13,6 +13,7 @@ import { grants } from '@/messages/grants';
 import { portfolio } from '@/messages/portfolio';
 import { members } from '@/messages/members';
 import { settings } from '@/messages/settings';
+import { monitor } from '@/messages/monitor';
 import { importMessages } from '@/messages/import';
 import { invite } from '@/messages/invite';
 import { employee } from '@/messages/employee';
@@ -36,6 +37,7 @@ export const vi = {
   portfolio,
   members,
   settings,
+  monitor,
   invite,
   import: importMessages,
 };

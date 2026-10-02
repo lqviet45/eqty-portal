@@ -12,6 +12,8 @@ export const common = {
     import: 'Nhập từ Excel',
     members: 'Thành viên',
     settings: 'Cài đặt',
+    operator: 'Người vận hành',
+    monitor: 'Giám sát',
     portfolio: 'Danh mục của tôi',
     openMenu: 'Mở menu',
     closeMenu: 'Đóng menu',
