@@ -1,0 +1,5 @@
+{
+  "oidcAuthority": "http://localhost:8080/realms/eqty",
+  "oidcClientId": "eqty-portal",
+  "apiBaseUrl": ""
+}
