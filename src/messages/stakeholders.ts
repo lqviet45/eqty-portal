@@ -10,7 +10,6 @@ export const stakeholders = {
   filterRelationship: 'Lọc theo quan hệ',
   filterEmployment: 'Lọc theo tình trạng',
   colHolder: 'Cổ đông',
-  colKind: 'Loại',
   colRelationship: 'Quan hệ',
   colOutstanding: 'Cổ phần lưu hành',
   colAwards: 'Quyền đã cấp',

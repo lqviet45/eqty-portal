@@ -389,7 +389,6 @@ export function StakeholdersPage() {
                       <thead>
                         <tr>
                           <th>{t.colHolder}</th>
-                          <th>{t.colKind}</th>
                           <th>{t.colRelationship}</th>
                           <th className="text-right">{t.colOutstanding}</th>
                           <th className="text-right">{t.colAwards}</th>
@@ -406,10 +405,9 @@ export function StakeholdersPage() {
                             <tr key={row.id} className={selected ? 'bg-teal-50' : undefined}>
                               <td className="stack-title whitespace-nowrap">
                                 <div className="font-semibold">{row.displayName}</div>
-                                <div className="text-[13px] text-slate-600">{row.email ?? '—'}</div>
-                              </td>
-                              <td data-label={t.colKind} className="whitespace-nowrap text-slate-600">
-                                {label(m.enums.stakeholderKind, row.kind)}
+                                <div className="text-[13px] text-slate-600">
+                                  {row.email ?? '—'} · {label(m.enums.stakeholderKind, row.kind)}
+                                </div>
                               </td>
                               <td data-label={t.colRelationship} className="whitespace-nowrap text-slate-600">
                                 {label(m.enums.relationship, row.relationship)}
