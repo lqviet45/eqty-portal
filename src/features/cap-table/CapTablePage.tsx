@@ -37,7 +37,7 @@ function CapTableView({ data }: { data: CapTableScreen }) {
     <>
       <Card>
         <TableWrap>
-          <table className="eqty-table">
+          <table className="eqty-table eqty-table--stack">
             <thead>
               <tr>
                 <th>{byClass ? t.colShareClass : t.colHolder}</th>
@@ -53,11 +53,11 @@ function CapTableView({ data }: { data: CapTableScreen }) {
             <tbody>
               {data.rows.map((row) => (
                 <tr key={`${row.kind}-${row.id}-${row.shareClassId ?? ''}`}>
-                  <td className="font-semibold whitespace-nowrap">
+                  <td className="stack-title font-semibold whitespace-nowrap">
                     {holderName(row, data.groupBy, t.poolUnallocated)}
                   </td>
                   {!byClass && (
-                    <td className="whitespace-nowrap text-slate-600">
+                    <td data-label={t.colRelationship} className="whitespace-nowrap text-slate-600">
                       {row.kind === 'EQUITY_POOL'
                         ? t.pool
                         : row.relationship
@@ -65,27 +65,47 @@ function CapTableView({ data }: { data: CapTableScreen }) {
                           : '—'}
                     </td>
                   )}
-                  {!byClass && <td className="whitespace-nowrap text-slate-600">{row.shareClassName ?? '—'}</td>}
-                  <td className="num">{formatCount(row.outstandingShares)}</td>
-                  <td className="num text-slate-600">
+                  {!byClass && (
+                    <td data-label={t.colClass} className="whitespace-nowrap text-slate-600">
+                      {row.shareClassName ?? '—'}
+                    </td>
+                  )}
+                  <td data-label={t.colOutstanding} className="num">
+                    {formatCount(row.outstandingShares)}
+                  </td>
+                  <td data-label={t.colOutstandingPct} className="num text-slate-600">
                     {row.outstandingShares === 0 ? '—' : formatPercentPlain(row.outstandingPercent)}
                   </td>
-                  <td className="num">
+                  <td data-label={t.colAwards} className="num">
                     {formatCount(row.kind === 'EQUITY_POOL' ? row.poolAvailable : row.grantedAwards)}
                   </td>
-                  <td className="num">{formatInt(row.fullyDiluted)}</td>
-                  <td className="num font-semibold">{formatPercentPlain(row.fullyDilutedPercent)}</td>
+                  <td data-label={t.colFullyDiluted} className="num">
+                    {formatInt(row.fullyDiluted)}
+                  </td>
+                  <td data-label={t.colFullyDilutedPct} className="num font-semibold">
+                    {formatPercentPlain(row.fullyDilutedPercent)}
+                  </td>
                 </tr>
               ))}
               <tr className="bg-slate-50 font-bold">
-                <td className="border-b-0!">{t.total}</td>
+                <td className="stack-title border-b-0!">{t.total}</td>
                 {!byClass && <td className="border-b-0!" />}
                 {!byClass && <td className="border-b-0!" />}
-                <td className="num border-b-0!">{formatInt(data.totals.outstandingShares)}</td>
-                <td className="num border-b-0!">100,00</td>
-                <td className="num border-b-0!">{formatInt(data.totals.grantedAwards + data.totals.poolAvailable)}</td>
-                <td className="num border-b-0!">{formatInt(data.totals.fullyDiluted)}</td>
-                <td className="num border-b-0!">100,00</td>
+                <td data-label={t.colOutstanding} className="num border-b-0!">
+                  {formatInt(data.totals.outstandingShares)}
+                </td>
+                <td data-label={t.colOutstandingPct} className="num border-b-0!">
+                  100,00
+                </td>
+                <td data-label={t.colAwards} className="num border-b-0!">
+                  {formatInt(data.totals.grantedAwards + data.totals.poolAvailable)}
+                </td>
+                <td data-label={t.colFullyDiluted} className="num border-b-0!">
+                  {formatInt(data.totals.fullyDiluted)}
+                </td>
+                <td data-label={t.colFullyDilutedPct} className="num border-b-0!">
+                  100,00
+                </td>
               </tr>
             </tbody>
           </table>
