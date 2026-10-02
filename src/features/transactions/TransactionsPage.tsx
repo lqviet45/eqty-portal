@@ -281,7 +281,7 @@ function TransactionView({ form }: { form: TransactionForm }) {
 
   return (
     <div className="flex flex-wrap items-start gap-5">
-      <Card className="flex min-w-0 flex-[1_1_440px] flex-col gap-4.5 px-6 py-5">
+      <Card className="flex min-w-0 flex-[3_1_520px] flex-col gap-4.5 px-6 py-5">
         <div role="tablist" aria-label={t.tabsLabel} className="flex flex-wrap gap-0.5 rounded-lg bg-slate-200 p-[3px]">
           {TYPES.map((tab) => (
             <button
@@ -302,7 +302,7 @@ function TransactionView({ form }: { form: TransactionForm }) {
 
         <WriteError error={write.error} onReload={() => write.reset()} />
 
-        <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4">
+        <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
           {type === 'ISSUE' && (
             <>
               <Field label={t.recipient} error={err('stakeholderId')}>
@@ -384,10 +384,10 @@ function TransactionView({ form }: { form: TransactionForm }) {
                   ))}
                 </Select>
               </Field>
-              <Field label={t.note} error={err('note')}>
+              <Field label={t.note} className="sm:col-span-2" error={err('note')}>
                 <Input value={f.note} onChange={(e) => set('note', e.target.value)} maxLength={500} />
               </Field>
-              <p className="text-[13px] text-slate-600">
+              <p className="text-[13px] text-slate-600 sm:col-span-2">
                 {form.pricePerShare
                   ? t.currentPrice(
                       formatMoney(form.pricePerShare.pricePerShare),
@@ -405,7 +405,7 @@ function TransactionView({ form }: { form: TransactionForm }) {
               invalid={Boolean(err('effectiveDate'))}
             />
           </Field>
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap gap-2.5 sm:col-span-2">
             <Button onClick={() => void submit()} loading={write.pending} disabled={!check.canSubmit || blocked}>
               {submitLabel}
             </Button>
@@ -417,7 +417,8 @@ function TransactionView({ form }: { form: TransactionForm }) {
         <Note>{m.preview.submitHint}</Note>
       </Card>
 
-      <div className="flex min-w-0 flex-[1_1_460px] flex-col gap-5">
+      {/* Stays in view while the form scrolls, so the checks answer each keystroke without hunting for them. */}
+      <div className="flex min-w-0 flex-[2_1_400px] flex-col gap-5 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
         <PreviewChecks checks={check.preview?.checks} checking={check.isChecking} />
         <Impact preview={check.preview} />
       </div>

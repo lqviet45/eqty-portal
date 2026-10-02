@@ -337,7 +337,7 @@ function Form({ form }: { form: GrantForm }) {
         </form>
       </Card>
 
-      <aside className="flex min-w-[300px] flex-[1_1_380px] flex-col gap-4">
+      <aside className="flex min-w-[300px] flex-[1_1_380px] flex-col gap-4 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
         <Card className="flex flex-col gap-4 px-6 py-5">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-[17px] font-bold">{t.previewTitle}</h2>
