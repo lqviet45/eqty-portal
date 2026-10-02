@@ -1,0 +1,62 @@
+import type { CompanyRole } from '@/lib/api/types';
+
+// A static export has no dynamic path segments, so the company travels as ?c=<companyId>.
+export const ROUTES = {
+  dashboard: '/dashboard/',
+  capTable: '/cap-table/',
+  newGrant: '/grants/new/',
+  stakeholders: '/stakeholders/',
+  transactions: '/transactions/',
+  equity: '/equity/',
+  ledger: '/ledger/',
+  import: '/import/',
+  members: '/members/',
+  settings: '/settings/',
+  portfolio: '/portfolio/',
+} as const;
+
+export type RouteKey = keyof typeof ROUTES;
+
+export const PICKER_PATH = '/companies/';
+export const NEW_COMPANY_PATH = '/companies/new/';
+
+export function companyHref(route: RouteKey, companyId: string, params: Record<string, string | null | undefined> = {}): string {
+  const search = new URLSearchParams({ c: companyId });
+  for (const [key, value] of Object.entries(params)) {
+    if (value) {
+      search.set(key, value);
+    }
+  }
+  return `${ROUTES[route]}?${search.toString()}`;
+}
+
+const ADMINS: CompanyRole[] = ['OWNER', 'ADMIN'];
+const LEDGER_READERS: CompanyRole[] = ['OWNER', 'ADMIN', 'VIEWER'];
+const EVERYONE: CompanyRole[] = ['OWNER', 'ADMIN', 'VIEWER', 'EMPLOYEE'];
+
+/** Which roles see which screen. Mirrors AccessPolicy in the API, which enforces it; this only hides what would be refused. */
+export const ROUTE_ROLES: Record<RouteKey, readonly CompanyRole[]> = {
+  dashboard: LEDGER_READERS,
+  capTable: LEDGER_READERS,
+  stakeholders: LEDGER_READERS,
+  equity: LEDGER_READERS,
+  ledger: LEDGER_READERS,
+  newGrant: ADMINS,
+  transactions: ADMINS,
+  import: ADMINS,
+  members: ADMINS,
+  settings: ADMINS,
+  portfolio: EVERYONE,
+};
+
+export function homeRouteOf(role: CompanyRole): RouteKey {
+  return role === 'EMPLOYEE' ? 'portfolio' : 'dashboard';
+}
+
+/** Only same-app paths are followed after sign-in: a crafted state must not become an open redirect. */
+export function safeReturnTo(value: unknown, fallback = '/'): string {
+  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) {
+    return fallback;
+  }
+  return value;
+}
