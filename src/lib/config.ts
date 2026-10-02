@@ -5,6 +5,8 @@ export interface RuntimeConfig {
   oidcClientId: string;
   /** Empty = same origin as the web app (the deployed setup: /api and /bff behind the same proxy). */
   apiBaseUrl: string;
+  /** Address of the operators' monitoring dashboard (https://monitor.<domain>); empty when there is none. */
+  monitorUrl: string;
 }
 
 // Loaded at runtime from /config.json so one build runs on any domain; deployment writes that file.
@@ -30,7 +32,7 @@ export function parseConfig(raw: unknown): RuntimeConfig {
   if (typeof raw !== 'object' || raw === null) {
     throw new Error('/config.json không hợp lệ.');
   }
-  const { oidcAuthority, oidcClientId, apiBaseUrl } = raw as Record<string, unknown>;
+  const { oidcAuthority, oidcClientId, apiBaseUrl, monitorUrl } = raw as Record<string, unknown>;
   if (typeof oidcAuthority !== 'string' || oidcAuthority === '') {
     throw new Error('/config.json thiếu oidcAuthority.');
   }
@@ -40,5 +42,21 @@ export function parseConfig(raw: unknown): RuntimeConfig {
   if (apiBaseUrl !== undefined && typeof apiBaseUrl !== 'string') {
     throw new Error('/config.json: apiBaseUrl phải là chuỗi.');
   }
-  return { oidcAuthority, oidcClientId, apiBaseUrl: (apiBaseUrl ?? '').replace(/\/+$/, '') };
+  return {
+    oidcAuthority,
+    oidcClientId,
+    apiBaseUrl: (apiBaseUrl ?? '').replace(/\/+$/, ''),
+    monitorUrl: parseMonitorUrl(monitorUrl),
+  };
+}
+
+// The link is rendered as an href, so anything but http(s) (a javascript: URL in a tampered file) is refused.
+function parseMonitorUrl(value: unknown): string {
+  if (value === undefined || value === '') {
+    return '';
+  }
+  if (typeof value !== 'string' || !/^https?:\/\/[^\s/]/i.test(value)) {
+    throw new Error('/config.json: monitorUrl phải là địa chỉ http(s).');
+  }
+  return value.replace(/\/+$/, '');
 }

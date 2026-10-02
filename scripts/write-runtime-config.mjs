@@ -14,6 +14,8 @@ const config = {
   oidcClientId: process.env.EQTY_OIDC_CLIENT_ID || 'eqty-portal',
   // Empty = same origin (a proxy serving both). On Vercel it is the backend's origin: the API allows CORS.
   apiBaseUrl: process.env.EQTY_API_BASE_URL || '',
+  // Where platform-admins open the monitoring dashboard (https://monitor.<domain> of the backend). Empty = no link.
+  monitorUrl: process.env.EQTY_MONITOR_URL || '',
 };
 writeFileSync(new URL('../public/config.json', import.meta.url), `${JSON.stringify(config, null, 2)}\n`);
 console.log(`write-runtime-config: wrote public/config.json for ${config.oidcAuthority}`);

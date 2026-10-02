@@ -14,11 +14,12 @@ import { useMessages } from '@/lib/i18n';
 import { CHOOSE_PATH, ROUTES, ROUTE_ROLES, companyHref, type RouteKey } from '@/lib/routes';
 import { Logo } from './Logo';
 
-type NavKey =
+type CompanyNavKey =
   'dashboard' | 'capTable' | 'stakeholders' | 'transactions' | 'equity' | 'ledger' | 'import' | 'members' | 'settings';
+type NavKey = CompanyNavKey | 'monitor';
 
-const MAIN: NavKey[] = ['dashboard', 'capTable', 'stakeholders', 'transactions', 'equity', 'ledger', 'import'];
-const ADMIN: NavKey[] = ['members', 'settings'];
+const MAIN: CompanyNavKey[] = ['dashboard', 'capTable', 'stakeholders', 'transactions', 'equity', 'ledger', 'import'];
+const ADMIN: CompanyNavKey[] = ['members', 'settings'];
 
 function NavLink({
   route,
@@ -38,10 +39,12 @@ function NavLink({
       aria-current={active ? 'page' : undefined}
       className={cn(
         'flex min-h-11 items-center rounded-lg px-3 hover:text-white',
+        route === 'monitor' && 'justify-between',
         active ? 'bg-sidebar-active font-semibold text-white' : 'hover:bg-sidebar-active/60 text-slate-300',
       )}
     >
       {m.common.nav[route]}
+      {route === 'monitor' && <span aria-hidden="true">↗</span>}
     </Link>
   );
 }
@@ -57,7 +60,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     void accountUrl().then(setAccount, () => setAccount(null));
   }, []);
 
-  const visible = (keys: NavKey[]) => keys.filter((key) => ROUTE_ROLES[key].includes(company.role));
+  const visible = (keys: CompanyNavKey[]) => keys.filter((key) => ROUTE_ROLES[key].includes(company.role));
   const main = visible(MAIN);
   const admin = visible(ADMIN);
   const isActive = (route: RouteKey) =>
@@ -76,6 +79,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         {admin.map((key) => (
           <NavLink key={key} route={key} active={isActive(key)} onNavigate={onNavigate} />
         ))}
+        {auth.user?.isPlatformAdmin && (
+          <>
+            <div className="bg-sidebar-active my-3 h-px" />
+            <div className="px-3 pb-1 text-[11px] tracking-[.08em] text-slate-400 uppercase">
+              {m.common.nav.operator}
+            </div>
+            <NavLink route="monitor" active={isActive('monitor')} onNavigate={onNavigate} />
+          </>
+        )}
       </nav>
 
       <div className="border-sidebar-active mt-auto flex flex-col gap-3 border-t pt-4 text-sm">

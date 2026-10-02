@@ -1,12 +1,15 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { isPlatformAdmin } from './roles';
 import { currentUser, getAccessToken, getUserManager, startLogin, startLogout, type LoginOptions } from './session';
 
 export interface SignedInUser {
   subject: string;
   displayName: string;
   email: string | null;
+  /** Operates the platform (sees the monitoring screen); unrelated to any company role. */
+  isPlatformAdmin: boolean;
 }
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated' | 'error';
@@ -30,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     let dispose: (() => void) | undefined;
 
-    function apply(next: { profile: { sub: string; name?: string; email?: string } } | null) {
+    function apply(next: { profile: { sub: string; name?: string; email?: string; [claim: string]: unknown } } | null) {
       if (cancelled) {
         return;
       }
@@ -39,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           subject: next.profile.sub,
           displayName: next.profile.name ?? next.profile.email ?? next.profile.sub,
           email: next.profile.email ?? null,
+          isPlatformAdmin: isPlatformAdmin(next.profile),
         });
         setStatus('authenticated');
       } else {

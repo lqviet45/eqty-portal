@@ -8,7 +8,7 @@ import { ButtonLink } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ErrorState, LoadingState } from '@/components/ui/States';
 import { useMessages } from '@/lib/i18n';
-import { PICKER_PATH, ROUTE_ROLES, companyHref, homeRouteOf, type RouteKey } from '@/lib/routes';
+import { PICKER_PATH, ROUTE_ROLES, companyHref, homeRouteOf, type CompanyRoute } from '@/lib/routes';
 
 interface CompanyContextValue {
   companyId: string;
@@ -90,7 +90,7 @@ export function useCompany(): CompanyContextValue {
 }
 
 /** Hides a screen from roles the API would refuse; the API still enforces the rule. */
-export function RoleGate({ route, children }: { route: RouteKey; children: ReactNode }) {
+export function RoleGate({ route, children }: { route: CompanyRoute; children: ReactNode }) {
   const m = useMessages();
   const { company, companyId } = useCompany();
   if (ROUTE_ROLES[route].includes(company.role)) {

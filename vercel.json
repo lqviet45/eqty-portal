@@ -5,7 +5,8 @@
     "env": {
       "EQTY_OIDC_AUTHORITY": "https://auth.103-74-100-41.sslip.io/realms/eqty",
       "EQTY_OIDC_CLIENT_ID": "eqty-portal",
-      "EQTY_API_BASE_URL": "https://app.103-74-100-41.sslip.io"
+      "EQTY_API_BASE_URL": "https://app.103-74-100-41.sslip.io",
+      "EQTY_MONITOR_URL": "https://monitor.103-74-100-41.sslip.io"
     }
   },
   "headers": [
