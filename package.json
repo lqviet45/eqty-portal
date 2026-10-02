@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "next dev -p 5173",
+    "prebuild": "node scripts/write-runtime-config.mjs",
     "build": "next build",
     "preview": "serve out -l 5173",
     "lint": "eslint .",

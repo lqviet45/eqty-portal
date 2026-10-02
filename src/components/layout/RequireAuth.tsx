@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useMessages } from '@/lib/i18n';
 import { Alert } from '@/components/ui/Alert';
@@ -18,22 +18,23 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   const m = useMessages();
   const auth = useAuth();
   const started = useRef(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     if (auth.status === 'unauthenticated' && !started.current) {
       started.current = true;
-      void auth.login();
+      auth.login().catch((cause: unknown) => setLoginError(cause instanceof Error ? cause.message : String(cause)));
     }
   }, [auth]);
 
   if (auth.status === 'authenticated') {
     return <>{children}</>;
   }
-  if (auth.status === 'error') {
+  if (auth.status === 'error' || loginError) {
     return (
       <FullScreen>
         <Alert tone="error" live title={m.common.error.configTitle} className="max-w-xl">
-          {auth.error}
+          {auth.error ?? loginError}
         </Alert>
         <Button variant="secondary" onClick={() => window.location.reload()}>
           {m.common.action.retry}

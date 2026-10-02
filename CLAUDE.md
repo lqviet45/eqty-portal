@@ -26,7 +26,7 @@ Cả năm phải sạch (CI chạy đúng các lệnh này). Sửa luồng đăn
 
 ## Kiến trúc
 
-- Next.js (App Router) **xuất tĩnh** (`output: 'export'`): chạy hoàn toàn ở trình duyệt, được phục vụ cùng origin với `/api` và `/bff`. Không có server component đọc dữ liệu, không route handler.
+- Next.js (App Router) **xuất tĩnh** (`output: 'export'`): chạy hoàn toàn ở trình duyệt, được phục vụ cùng origin với `/api` và `/bff` (Vercel rewrite hoặc cùng reverse proxy), nên không cần CORS. Không có server component đọc dữ liệu, không route handler.
 - Không có segment động trong đường dẫn: công ty đi theo `?c=<companyId>` (`lib/routes.ts`). Mỗi màn là một thư mục `src/app/(app)/<màn>/page.tsx` mỏng, gọi component trong `src/features/<màn>/`.
 - Đăng nhập: OIDC Authorization Code + PKCE với client `eqty-portal` của Keycloak (`lib/auth`). Cấu hình đọc lúc chạy từ `/config.json` (`lib/config.ts`) để một bản build chạy được trên mọi domain.
 - Đọc: một endpoint BFF cho mỗi màn (`useApiQuery`). Ghi: `/api/v1` qua `useWrite`. Kiểm tra trước khi ghi: `:preview` qua `usePreview`.
