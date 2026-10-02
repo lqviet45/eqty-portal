@@ -69,7 +69,22 @@ describe('parsing what people type', () => {
     expect(parseWholeNumber(text)).toBe(expected);
   });
 
-  it.each(['', 'abc', '12a', '-5', '1e3', '9007199254740993'])('rejects %j as a whole number', (text) => {
+  // "1.5" used to read as 15: every separator was dropped, so a decimal typo became a ten-times-larger quantity.
+  it.each([
+    '',
+    'abc',
+    '12a',
+    '-5',
+    '1e3',
+    '9007199254740993',
+    '1.5',
+    '1,5',
+    '12.34',
+    '1.0000',
+    '1..000',
+    '1.000,5',
+    '.000',
+  ])('rejects %j as a whole number', (text) => {
     expect(parseWholeNumber(text)).toBeNull();
   });
 
