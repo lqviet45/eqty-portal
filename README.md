@@ -73,19 +73,17 @@ Trình duyệt: `EQTY_CHROMIUM_PATH` trỏ tới Chromium có sẵn; không đ�
 
 Import repo vào Vercel, không cần chỉnh cài đặt: `vercel.json` đã khai mọi thứ.
 
-- **Chuyển tiếp API**: `/api/*` và `/bff/*` được Vercel chuyển sang `https://app.103-74-100-41.sslip.io`. Trình duyệt chỉ nói chuyện với một origin nên không cần CORS (API trên VPS không có CORS). Đổi domain backend thì sửa `rewrites` và `build.env` trong `vercel.json`.
-- **Cấu hình chạy**: `npm run build` chạy `scripts/write-runtime-config.mjs` ghi `public/config.json` từ `build.env` (`EQTY_OIDC_AUTHORITY`, `EQTY_OIDC_CLIENT_ID`, tùy chọn `EQTY_API_BASE_URL`). Không đặt biến thì giữ `config.json` của local.
+- **Gọi thẳng API ở VPS**: `build.env.EQTY_API_BASE_URL` trong `vercel.json` là origin của backend; trình duyệt gọi `https://app.<domain>/api` và `/bff` trực tiếp (API cho phép CORS, xác thực bằng header `Authorization` chứ không dùng cookie). Không dùng rewrite của Vercel: với `trailingSlash` Vercel thêm dấu `/` vào đường dẫn API và chuyển hướng 308, làm mọi lệnh gọi thành 404 (đã gặp trên bản deploy thật).
+- **Cấu hình chạy**: `npm run build` chạy `scripts/write-runtime-config.mjs` ghi `public/config.json` từ `build.env` (`EQTY_OIDC_AUTHORITY`, `EQTY_OIDC_CLIENT_ID`, `EQTY_API_BASE_URL`). Không đặt biến thì giữ `config.json` của local.
 - Header bảo mật và `Referrer-Policy: no-referrer` (URL lời mời chứa token dùng một lần) cũng nằm trong `vercel.json`.
 
-**Việc phải làm một lần trên VPS** (không phải code), sau khi có địa chỉ Vercel `https://<app>.vercel.app`:
+**Việc phải làm một lần trên VPS** (không phải code; script có sẵn trong eqty-engine-service):
 
-1. **Keycloak** (đã kiểm: realm đang từ chối `redirect_uri` ngoài `app.<domain>`, báo `Invalid parameter: redirect_uri`). Vào console qua SSH tunnel (README backend, "Keycloak admin"): realm `eqty` → Clients → `eqty-portal`:
-   - Valid redirect URIs: thêm `https://<app>.vercel.app/*`
-   - Valid post logout redirect URIs: thêm `https://<app>.vercel.app/*`
-   - Web origins: thêm `https://<app>.vercel.app`
-2. **Link trong email lời mời**: đặt `Email__PortalBaseUrl=https://<app>.vercel.app` cho Worker rồi `docker compose up -d worker`.
+1. Backend phải có CORS (`Cors.cs`, PR #11 của eqty-engine-service) và đã deploy. Chưa có thì trình duyệt chặn mọi lệnh gọi từ Vercel (preflight bị 401, không có header cho phép).
+2. Trong `deploy/.env` của VPS: `EQTY_WEB_ORIGINS=https://<app>.vercel.app`, rồi `./scripts/deploy.sh` (hoặc riêng `./scripts/keycloak-sync.sh`): thêm origin vào client `eqty-portal` của Keycloak (redirect, post-logout, web origins).
+3. Link trong email lời mời: đặt `Email__PortalBaseUrl=https://<app>.vercel.app` cho Worker rồi `docker compose up -d worker`.
 
-Giới hạn cần biết: API thấy mọi request từ FE đến từ địa chỉ của Vercel, nên giới hạn tần suất của endpoint công khai (`invitations:preview`, 10 request/phút) tính chung cho mọi người dùng; với số người dùng nhỏ thì đủ. Preview deployment của Vercel có URL ngẫu nhiên nên không đăng nhập được trừ khi thêm chúng vào Keycloak.
+Preview deployment của Vercel có URL ngẫu nhiên nên không đăng nhập được trừ khi thêm chúng vào `EQTY_WEB_ORIGINS`.
 
 ### Máy chủ tĩnh khác (nginx, Caddy)
 
