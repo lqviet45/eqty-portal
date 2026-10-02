@@ -35,4 +35,11 @@ export const portfolio = {
   noGrants: 'Chưa có grant nào.',
   grantShort: (id: string) => id.slice(0, 8),
   overallTitle: 'Tổng quan',
+  colDate: 'Ngày',
+  colMilestone: 'Mốc',
+  colAdd: 'Thêm',
+  colTotal: 'Tích lũy',
+  milestoneCliff: (months: number) => `Qua cliff ${months} tháng`,
+  milestoneMonth: (months: number) => `Tháng ${months}`,
+  milestoneDone: 'Hoàn tất',
 } as const;

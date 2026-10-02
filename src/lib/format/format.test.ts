@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDate, formatDateTime, isRealDate, parseDate } from './date';
+import { formatDate, formatDateTime, isRealDate, monthsBetween, parseDate } from './date';
 import {
   formatBytes,
   formatCount,
@@ -110,5 +110,14 @@ describe('dates', () => {
   it('shows instants in Vietnam time (UTC+7)', () => {
     expect(formatDateTime('2026-10-01T03:14:07.512Z')).toBe('01/10/2026 10:14');
     expect(formatDateTime('2026-09-30T18:00:00Z')).toBe('01/10/2026 01:00');
+  });
+});
+
+describe('months between business dates', () => {
+  it('counts calendar months from the vesting start', () => {
+    expect(monthsBetween('2025-09-01', '2026-10-01')).toBe(13);
+    expect(monthsBetween('2025-09-01', '2026-09-01')).toBe(12);
+    expect(monthsBetween('2025-09-01', '2029-09-01')).toBe(48);
+    expect(monthsBetween('2025-09-01', 'x')).toBeNull();
   });
 });

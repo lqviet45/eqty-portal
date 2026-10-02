@@ -79,3 +79,13 @@ export function formatInstantDate(instant: string | null | undefined): string {
 export function daysUntil(instant: string, now: Date = new Date()): number {
   return Math.ceil((new Date(instant).getTime() - now.getTime()) / 86_400_000);
 }
+
+/** Whole calendar months from one business date to another ("2025-09-01" → "2026-10-01" = 13); text only, no Date. */
+export function monthsBetween(from: string, to: string): number | null {
+  const a = DATE_ONLY.exec(from);
+  const b = DATE_ONLY.exec(to);
+  if (!a || !b) {
+    return null;
+  }
+  return (Number(b[1]) - Number(a[1])) * 12 + (Number(b[2]) - Number(a[2]));
+}
