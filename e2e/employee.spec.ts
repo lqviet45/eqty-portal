@@ -81,8 +81,18 @@ test('an employee accepts an invitation, sees the portfolio and confirms the gra
 
   // Schedule tab, and an employee cannot open an admin screen.
   await employee.getByRole('link', { name: 'Lịch' }).click();
-  await expect(employee.getByText('Lịch vesting')).toBeVisible();
+  await expect(employee.getByText(/^Lịch vesting · /).first()).toBeVisible();
   await employee.goto(`/dashboard/?c=${companyId}`);
   await expect(employee.getByText('Bạn không có quyền xem màn này')).toBeVisible();
+
+  // Desktop layout (design "Cổng nhân viên (web)"): side menu, cards side by side, the schedule as a table.
+  await employee.setViewportSize({ width: 1440, height: 1100 });
+  await employee.goto(`/portfolio/?c=${companyId}`);
+  const menu = employee.getByRole('navigation', { name: 'Điều hướng chính' });
+  await expect(menu.getByRole('link', { name: 'Lịch vesting' })).toBeVisible();
+  await expect(menu.getByRole('link', { name: 'Điều khoản grant' })).toBeVisible();
+  await expect(employee.getByRole('columnheader', { name: 'Tích lũy' })).toBeVisible();
+  await expect(employee.getByRole('cell', { name: 'Qua cliff 12 tháng' })).toBeVisible();
+  await employee.screenshot({ path: 'test-results/screens/23-portfolio-web.png', fullPage: true });
   await context.close();
 });
