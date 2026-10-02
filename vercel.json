@@ -4,22 +4,36 @@
   "build": {
     "env": {
       "EQTY_OIDC_AUTHORITY": "https://auth.103-74-100-41.sslip.io/realms/eqty",
-      "EQTY_OIDC_CLIENT_ID": "eqty-portal"
+      "EQTY_OIDC_CLIENT_ID": "eqty-portal",
+      "EQTY_API_BASE_URL": "https://app.103-74-100-41.sslip.io"
     }
   },
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "https://app.103-74-100-41.sslip.io/api/:path*" },
-    { "source": "/bff/:path*", "destination": "https://app.103-74-100-41.sslip.io/bff/:path*" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Referrer-Policy", "value": "no-referrer" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" }
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        }
       ]
     },
-    { "source": "/config.json", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
+    {
+      "source": "/config.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
   ]
 }

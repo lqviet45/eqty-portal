@@ -12,7 +12,7 @@ if (!authority) {
 const config = {
   oidcAuthority: authority,
   oidcClientId: process.env.EQTY_OIDC_CLIENT_ID || 'eqty-portal',
-  // Empty = same origin: Vercel forwards /api and /bff to the backend (vercel.json rewrites).
+  // Empty = same origin (a proxy serving both). On Vercel it is the backend's origin: the API allows CORS.
   apiBaseUrl: process.env.EQTY_API_BASE_URL || '',
 };
 writeFileSync(new URL('../public/config.json', import.meta.url), `${JSON.stringify(config, null, 2)}\n`);
