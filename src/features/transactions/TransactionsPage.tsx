@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PreviewChecks } from '@/components/checks/PreviewChecks';
+import { PreviewChecks, SubmitStatus } from '@/components/checks/PreviewChecks';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Field';
 import { Card, PageHeader, Panel, TableWrap } from '@/components/ui/Layout';
@@ -21,7 +21,7 @@ import { errorFor, failedFieldErrors } from '@/lib/checks';
 import { RoleGate, useCompany } from '@/lib/company';
 import { formatDate } from '@/lib/format/date';
 import { formatInt, formatMoney, formatPercentPlain } from '@/lib/format/number';
-import { parseDecimalAmount, parseWholeNumber } from '@/lib/format/parse';
+import { groupDecimalInput, groupWholeInput, parseDecimalAmount, parseWholeNumber } from '@/lib/format/parse';
 import { useMessages } from '@/lib/i18n';
 import { cn } from '@/lib/cn';
 import { enums } from '@/messages/enums';
@@ -235,6 +235,7 @@ function TransactionView({ form }: { form: TransactionForm }) {
         inputMode="numeric"
         value={f.quantity}
         onChange={(e) => set('quantity', e.target.value)}
+        onBlur={() => set('quantity', groupWholeInput(f.quantity))}
         invalid={Boolean(err('quantity'))}
       />
     </Field>
@@ -249,6 +250,7 @@ function TransactionView({ form }: { form: TransactionForm }) {
         inputMode="decimal"
         value={f.price}
         onChange={(e) => set('price', e.target.value)}
+        onBlur={() => set('price', groupDecimalInput(f.price))}
         invalid={Boolean(err('pricePerShare'))}
       />
     </Field>
@@ -413,6 +415,12 @@ function TransactionView({ form }: { form: TransactionForm }) {
               {m.common.action.reset}
             </Button>
           </div>
+          <SubmitStatus
+            checks={check.preview?.checks}
+            checking={check.isChecking}
+            canSubmit={check.canSubmit}
+            localErrors={blocked}
+          />
         </form>
         <Note>{m.preview.submitHint}</Note>
       </Card>

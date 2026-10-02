@@ -1,6 +1,8 @@
 // Turns what a person typed into what the API takes. Both return null for input that is not a clean number,
 // so a form can leave the field empty in the request and let the server's check say what is missing.
 
+import { formatDecimalString, formatInt } from './number';
+
 const MAX_SAFE = Number.MAX_SAFE_INTEGER;
 
 /** "1.000.000", "1,000,000" or "1000000" → 1000000. Whole numbers only. */
@@ -54,4 +56,20 @@ export function parseDecimalAmount(text: string): string | null {
   }
   const normalized = whole.replace(/^0+(?=\d)/, '');
   return fraction === '' ? normalized : `${normalized}.${fraction}`;
+}
+
+/**
+ * What a quantity box shows once the person leaves it: "1000000" → "1.000.000". Text that is not a clean
+ * number is left alone so the field's error still points at what was typed.
+ */
+export function groupWholeInput(text: string): string {
+  // parseWholeNumber ignores every separator ("1.5" reads as 15); only regroup digits that already look grouped.
+  const value = /^\s*(\d+|\d{1,3}([.,\s]\d{3})+)\s*$/.test(text) ? parseWholeNumber(text) : null;
+  return value === null ? text : formatInt(value);
+}
+
+/** Same for money: "25000,5" → "25.000,5". Reads back to the same amount through parseDecimalAmount. */
+export function groupDecimalInput(text: string): string {
+  const amount = parseDecimalAmount(text);
+  return amount === null ? text : formatDecimalString(amount);
 }
