@@ -163,8 +163,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <aside className="bg-sidebar sticky top-0 hidden h-screen w-60 shrink-0 overflow-y-auto p-4 lg:block">
-        <SidebarContent />
+      {/* The column (and its dark background) stretches to the full page height; only its content sticks. */}
+      <aside className="bg-sidebar hidden w-60 shrink-0 lg:block">
+        <div className="sticky top-0 h-screen overflow-y-auto p-4">
+          <SidebarContent />
+        </div>
       </aside>
 
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-8 lg:px-10 lg:py-7">
