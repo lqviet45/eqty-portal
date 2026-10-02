@@ -17,6 +17,7 @@ export const capTable = {
   pool: 'Quỹ',
   poolUnallocated: (name: string) => `${name} — chưa cấp`,
   empty: 'Chưa có cổ phần nào được ghi vào sổ cái.',
+  emptyAction: 'Ghi nhận phát hành',
   exporting: 'Đang xuất…',
   exportFailed: 'Không xuất được file Excel',
   price: (value: string, date: string) => `Giá gần nhất ${value}, hiệu lực ${date}`,

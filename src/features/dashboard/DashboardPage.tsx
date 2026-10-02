@@ -17,6 +17,7 @@ import { useMessages } from '@/lib/i18n';
 import { describeEntry } from '@/lib/ledger/describe';
 import { companyHref } from '@/lib/routes';
 import { enums, label } from '@/messages/enums';
+import { SetupGuide } from './SetupGuide';
 
 const STAKEHOLDER_COLORS = ['#0f766e', '#5eead4', '#1e3a8a', '#93c5fd', '#7c3aed', '#c4b5fd', '#be185d', '#f9a8d4'];
 const AWARD_COLOR = '#b45309';
@@ -109,10 +110,13 @@ function Ownership({ data }: { data: Dashboard }) {
   );
 }
 
-function DashboardView({ data }: { data: Dashboard }) {
+function DashboardView({ data, picksDate }: { data: Dashboard; picksDate: boolean }) {
   const m = useMessages();
   const { companyId } = useCompany();
   const { kpis } = data;
+  // Before the first issue the ledger has nothing to show, so walk the owner through setting it up instead.
+  // Only for today's view: on a date picked before the first issue an empty ledger is just history.
+  const settingUp = !picksDate && !data.ownership.some((slice) => slice.category === 'STAKEHOLDER_SHARES');
   const used = kpis.pool.size === 0 ? 0 : (kpis.pool.availableQuantity / kpis.pool.size) * 100; // bar width only
 
   return (
@@ -131,51 +135,60 @@ function DashboardView({ data }: { data: Dashboard }) {
         </Alert>
       )}
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
-        <Kpi
-          label={m.dashboard.kpiOutstanding}
-          value={formatInt(kpis.outstandingShares)}
-          sub={m.dashboard.kpiOutstandingSub(formatInt(kpis.authorizedShares))}
-        />
-        <Kpi
-          label={m.dashboard.kpiFullyDiluted}
-          value={formatInt(kpis.fullyDilutedShares)}
-          sub={m.dashboard.kpiFullyDilutedSub}
-        />
-        <Kpi
-          label={m.dashboard.kpiPool}
-          value={
-            <>
-              {formatInt(kpis.pool.availableQuantity)}{' '}
-              <span className="text-[15px] font-normal text-slate-500">/ {formatInt(kpis.pool.size)}</span>
-            </>
-          }
-        >
-          <div className="mt-1">
-            <ProgressBar percent={used} label={m.dashboard.kpiPool} />
+      {settingUp ? (
+        <>
+          <SetupGuide data={data} />
+          {data.recentActivity.length > 0 && <RecentActivity data={data} />}
+        </>
+      ) : (
+        <>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+            <Kpi
+              label={m.dashboard.kpiOutstanding}
+              value={formatInt(kpis.outstandingShares)}
+              sub={m.dashboard.kpiOutstandingSub(formatInt(kpis.authorizedShares))}
+            />
+            <Kpi
+              label={m.dashboard.kpiFullyDiluted}
+              value={formatInt(kpis.fullyDilutedShares)}
+              sub={m.dashboard.kpiFullyDilutedSub}
+            />
+            <Kpi
+              label={m.dashboard.kpiPool}
+              value={
+                <>
+                  {formatInt(kpis.pool.availableQuantity)}{' '}
+                  <span className="text-[15px] font-normal text-slate-500">/ {formatInt(kpis.pool.size)}</span>
+                </>
+              }
+            >
+              <div className="mt-1">
+                <ProgressBar percent={used} label={m.dashboard.kpiPool} />
+              </div>
+            </Kpi>
+            <Kpi
+              label={m.dashboard.kpiPrice}
+              value={kpis.pricePerShare ? formatMoney(kpis.pricePerShare.pricePerShare) : m.dashboard.kpiPriceNone}
+              sub={
+                kpis.pricePerShare
+                  ? m.dashboard.kpiPriceSub(
+                      formatDate(kpis.pricePerShare.effectiveDate),
+                      label(enums.priceSource, kpis.pricePerShare.source),
+                    )
+                  : undefined
+              }
+            />
           </div>
-        </Kpi>
-        <Kpi
-          label={m.dashboard.kpiPrice}
-          value={kpis.pricePerShare ? formatMoney(kpis.pricePerShare.pricePerShare) : m.dashboard.kpiPriceNone}
-          sub={
-            kpis.pricePerShare
-              ? m.dashboard.kpiPriceSub(
-                  formatDate(kpis.pricePerShare.effectiveDate),
-                  label(enums.priceSource, kpis.pricePerShare.source),
-                )
-              : undefined
-          }
-        />
-      </div>
 
-      {/* Who owns what next to what is about to change; the activity feed runs full width below. */}
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <Ownership data={data} />
-        <Upcoming data={data} />
-      </div>
+          {/* Who owns what next to what is about to change; the activity feed runs full width below. */}
+          <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+            <Ownership data={data} />
+            <Upcoming data={data} />
+          </div>
 
-      <RecentActivity data={data} />
+          <RecentActivity data={data} />
+        </>
+      )}
     </>
   );
 }
@@ -291,7 +304,7 @@ export function DashboardPage() {
           </>
         }
       />
-      <Async query={query}>{(data) => <DashboardView data={data} />}</Async>
+      <Async query={query}>{(data) => <DashboardView data={data} picksDate={asOfDate !== ''} />}</Async>
     </RoleGate>
   );
 }

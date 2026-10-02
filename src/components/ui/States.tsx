@@ -45,8 +45,14 @@ export function ErrorState({ error, onRetry, title }: { error: unknown; onRetry?
   );
 }
 
-export function EmptyState({ children }: { children: ReactNode }) {
-  return <div className="px-5 py-10 text-center text-slate-600">{children}</div>;
+/** An empty list: what is missing and, when the viewer can fix it, the one button that does. */
+export function EmptyState({ children, action }: { children: ReactNode; action?: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-4 px-5 py-10 text-center text-slate-600">
+      <p>{children}</p>
+      {action}
+    </div>
+  );
 }
 
 /** Renders loading and error states for a query, then its data. */

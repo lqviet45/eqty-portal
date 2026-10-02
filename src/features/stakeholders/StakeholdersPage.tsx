@@ -381,7 +381,14 @@ export function StakeholdersPage() {
           <Async query={query}>
             {(data) =>
               data.items.length === 0 ? (
-                <EmptyState>{data.totalCount === 0 ? t.empty : m.common.state.noMatch}</EmptyState>
+                <EmptyState
+                  action={
+                    data.totalCount === 0 &&
+                    canWrite && <Button onClick={() => setPanel({ mode: 'add' })}>{t.add}</Button>
+                  }
+                >
+                  {data.totalCount === 0 ? t.empty : m.common.state.noMatch}
+                </EmptyState>
               ) : (
                 <>
                   <TableWrap>

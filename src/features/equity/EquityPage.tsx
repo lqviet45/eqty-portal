@@ -308,7 +308,18 @@ function EquityView({
       <div className="flex min-w-0 flex-[1_1_640px] flex-col gap-5">
         <Panel title={t.poolsTitle} aside={t.poolsNote(formatDate(screen.asOfDate))}>
           {screen.pools.length === 0 ? (
-            <EmptyState>{t.noPools}</EmptyState>
+            <EmptyState
+              action={
+                screen.actions.createPool &&
+                screen.shareClasses.length > 0 && (
+                  <Button variant="secondary" onClick={() => setMode({ action: 'CREATE_POOL' })}>
+                    {t.newPool}
+                  </Button>
+                )
+              }
+            >
+              {t.noPools}
+            </EmptyState>
           ) : (
             <TableWrap>
               <table className="eqty-table">
@@ -364,7 +375,15 @@ function EquityView({
 
         <Panel title={t.classesTitle} aside={t.classesNote}>
           {screen.shareClasses.length === 0 ? (
-            <EmptyState>{t.noClasses}</EmptyState>
+            <EmptyState
+              action={
+                screen.actions.createShareClass && (
+                  <Button onClick={() => setMode({ action: 'CREATE_SHARE_CLASS' })}>{t.newClass}</Button>
+                )
+              }
+            >
+              {t.noClasses}
+            </EmptyState>
           ) : (
             <TableWrap>
               <table className="eqty-table">

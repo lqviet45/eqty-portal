@@ -26,7 +26,7 @@ test('founder creates a company and builds its ledger', async ({ page }) => {
 
   // --- share class
   await nav(page, 'Quỹ ESOP & lớp CP');
-  await page.getByRole('button', { name: 'Tạo lớp cổ phần' }).click();
+  await page.getByRole('button', { name: 'Tạo lớp cổ phần' }).first().click();
   await page.getByLabel('Tên lớp').fill('Phổ thông');
   await page.getByLabel('Số được phép phát hành').fill('2.000.000');
   await expect(page.getByRole('button', { name: 'Tạo lớp', exact: true })).toBeEnabled();
@@ -35,7 +35,7 @@ test('founder creates a company and builds its ledger', async ({ page }) => {
   await expect(page.getByRole('cell', { name: 'Phổ thông', exact: true }).first()).toBeVisible();
 
   // --- pool
-  await page.getByRole('button', { name: 'Tạo quỹ ESOP' }).click();
+  await page.getByRole('button', { name: 'Tạo quỹ ESOP' }).first().click();
   await page.getByLabel('Tên quỹ').fill('ESOP 2025');
   await page.getByLabel('Lớp cổ phần').selectOption({ label: 'Phổ thông' });
   await page.getByLabel('Quy mô').fill('150.000');

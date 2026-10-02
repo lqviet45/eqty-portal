@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Alert } from '@/components/ui/Alert';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonLink } from '@/components/ui/Button';
 import { AsOfDateField } from '@/components/ui/DateField';
 import { Card, PageHeader, Segmented, TableWrap } from '@/components/ui/Layout';
 import { Async, EmptyState } from '@/components/ui/States';
@@ -14,6 +14,7 @@ import { RoleGate, useCompany } from '@/lib/company';
 import { formatDate } from '@/lib/format/date';
 import { formatCount, formatInt, formatMoney, formatPercentPlain } from '@/lib/format/number';
 import { useMessages } from '@/lib/i18n';
+import { companyHref } from '@/lib/routes';
 import { enums, label } from '@/messages/enums';
 
 function holderName(row: CapTableRow, grouping: CapTableGrouping, poolLabel: (name: string) => string): string {
@@ -22,13 +23,22 @@ function holderName(row: CapTableRow, grouping: CapTableGrouping, poolLabel: (na
 
 function CapTableView({ data }: { data: CapTableScreen }) {
   const m = useMessages();
+  const { companyId, company } = useCompany();
   const t = m.capTable;
   const byClass = data.groupBy === 'SHARE_CLASS';
 
   if (data.rows.length === 0) {
     return (
       <Card>
-        <EmptyState>{t.empty}</EmptyState>
+        <EmptyState
+          action={
+            (company.role === 'OWNER' || company.role === 'ADMIN') && (
+              <ButtonLink href={companyHref('transactions', companyId)}>{t.emptyAction}</ButtonLink>
+            )
+          }
+        >
+          {t.empty}
+        </EmptyState>
       </Card>
     );
   }
