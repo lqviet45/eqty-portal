@@ -26,21 +26,21 @@ function asApiError(error: unknown): ApiError | null {
 /** Query keys of everything that depends on one company's ledger start with this prefix. */
 export const companyKey = (companyId: string) => ['c', companyId] as const;
 
-export interface ApiQueryOptions {
+export interface ApiQueryOptions<T = unknown> {
   query?: Record<string, QueryValue>;
   enabled?: boolean;
   /** Poll while something runs in the background (Excel import). */
-  refetchInterval?: number | false;
+  refetchInterval?: number | false | ((data: T | undefined) => number | false);
   /** Keep showing the previous result while a new filter loads. */
   keepPrevious?: boolean;
 }
 
-export function useApiQuery<T>(key: readonly unknown[], path: string, options: ApiQueryOptions = {}) {
+export function useApiQuery<T>(key: readonly unknown[], path: string, options: ApiQueryOptions<T> = {}) {
   const query = useQuery({
     queryKey: [...key, options.query ?? null],
     queryFn: ({ signal }) => api.get<T>(path, { query: options.query, signal }),
     enabled: options.enabled ?? true,
-    refetchInterval: options.refetchInterval,
+    refetchInterval: typeof options.refetchInterval === 'function' ? (q) => (options.refetchInterval as (data: T | undefined) => number | false)(q.state.data?.data) : options.refetchInterval,
     placeholderData: options.keepPrevious ? keepPreviousData : undefined,
   });
   return {
@@ -57,6 +57,14 @@ export function useApiQuery<T>(key: readonly unknown[], path: string, options: A
 }
 
 export type ApiQuery<T> = ReturnType<typeof useApiQuery<T>>;
+
+/** JSON.stringify(FormData) is "{}": fingerprint uploads by file identity so a different file never reuses a key. */
+function fingerprintBody(body: unknown): unknown {
+  if (typeof FormData !== 'undefined' && body instanceof FormData) {
+    return Array.from(body.entries(), ([key, value]) => [key, value instanceof File ? `${value.name}:${value.size}:${value.lastModified}` : value]);
+  }
+  return body;
+}
 
 export interface WriteOptions {
   /** Ledger version the user decided on. */
@@ -81,7 +89,7 @@ export function useWrite(companyId: string | null) {
     async <TResult = unknown>(path: string, body: unknown, options: WriteOptions = {}): Promise<ApiResponse<TResult> | null> => {
       setPending(true);
       setError(null);
-      const idempotencyKey = options.idempotent === false ? undefined : keys.current.next({ path, body });
+      const idempotencyKey = options.idempotent === false ? undefined : keys.current.next({ path, body: fingerprintBody(body) });
       try {
         const response = await api.post<TResult>(path, body, { ifMatch: options.ifMatch, idempotencyKey });
         keys.current.settle();

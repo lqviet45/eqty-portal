@@ -10,12 +10,17 @@ import { transactions } from '@/messages/transactions';
 import { equity } from '@/messages/equity';
 import { ledger } from '@/messages/ledger';
 import { grants } from '@/messages/grants';
+import { portfolio } from '@/messages/portfolio';
+import { members } from '@/messages/members';
+import { settings } from '@/messages/settings';
+import { importMessages } from '@/messages/import';
+import { invite } from '@/messages/invite';
 import { employee } from '@/messages/employee';
 import { enums } from '@/messages/enums';
 
 // Vietnamese is the only locale today. Components read text through useMessages() so adding English means
 // a second catalog with the same shape, not edits across screens.
-export const vi = { common, enums, employee, companies, dashboard, capTable, preview, stakeholders, transactions, equity, ledger, grants };
+export const vi = { common, enums, employee, companies, dashboard, capTable, preview, stakeholders, transactions, equity, ledger, grants, portfolio, members, settings, invite, import: importMessages };
 export type Messages = typeof vi;
 
 export function useMessages(): Messages {
@@ -46,4 +51,9 @@ export function describeError(error: unknown): ErrorText {
 
 function retryHint(error: ApiError): string | null {
   return error.retryAfterSeconds ? `Thử lại sau ${error.retryAfterSeconds} giây.` : null;
+}
+
+/** Vietnamese text for a bare API code (e.g. the failure code stored on an import). */
+export function describeCode(code: string): string {
+  return errorMessages[code] ?? checkTitles[code] ?? code;
 }
