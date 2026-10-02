@@ -52,12 +52,11 @@ export function PreviewChecks({
                 {label(m.enums.checkStatus, check.status)}
               </Badge>
               <div className="min-w-0">
-                <div className="text-sm font-medium">{checkTitles[check.code] ?? check.code}</div>
-                {check.detail && <div className="text-[13px] text-slate-600">{check.detail}</div>}
-                <div className="font-mono text-[11.5px] text-slate-500">
-                  {check.code}
-                  {check.pointer ? ` · ${check.pointer}` : ''}
+                {/* The code is for support, not for the reader: it stays a tooltip. */}
+                <div className="text-sm font-medium" title={check.code}>
+                  {checkTitles[check.code] ?? check.code}
                 </div>
+                {check.detail && <div className="text-[13px] text-slate-600">{check.detail}</div>}
               </div>
             </li>
           ))}
@@ -71,5 +70,44 @@ export function PreviewChecks({
     <div className="flex flex-col gap-1">{list}</div>
   ) : (
     <section className="flex flex-col gap-1 rounded-xl border border-slate-200 bg-white px-5 py-4">{list}</section>
+  );
+}
+
+/**
+ * Says why the write button is off, from what the server's preview already reported. It never decides:
+ * the button follows `canSubmit`; this only names the failed checks.
+ */
+export function SubmitStatus({
+  checks,
+  checking,
+  canSubmit,
+  localErrors,
+}: {
+  checks: readonly PreviewCheck[] | null | undefined;
+  checking: boolean;
+  canSubmit: boolean;
+  localErrors: boolean;
+}) {
+  const m = useMessages();
+  if (checking || (canSubmit && !localErrors)) {
+    return null;
+  }
+  const failed = checks?.filter((check) => check.status === 'FAILED') ?? [];
+  const text = localErrors
+    ? m.preview.blockedLocal
+    : failed.length > 0
+      ? m.preview.blockedChecks(failed.length)
+      : m.preview.blockedEmpty;
+  return (
+    <div className="flex flex-col gap-0.5 text-[13px] text-slate-600 sm:col-span-2" role="status">
+      <span>{text}</span>
+      {!localErrors && failed.length > 0 && (
+        <ul className="list-disc pl-5">
+          {failed.map((check, index) => (
+            <li key={`${check.code}-${index}`}>{checkTitles[check.code] ?? check.code}</li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

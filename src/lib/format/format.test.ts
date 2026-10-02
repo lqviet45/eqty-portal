@@ -9,7 +9,7 @@ import {
   formatPercent,
   formatSignedInt,
 } from './number';
-import { parseDecimalAmount, parseWholeNumber } from './parse';
+import { groupDecimalInput, groupWholeInput, parseDecimalAmount, parseWholeNumber } from './parse';
 
 describe('number formatting (vi-VN)', () => {
   it('groups thousands with dots', () => {
@@ -69,7 +69,22 @@ describe('parsing what people type', () => {
     expect(parseWholeNumber(text)).toBe(expected);
   });
 
-  it.each(['', 'abc', '12a', '-5', '1e3', '9007199254740993'])('rejects %j as a whole number', (text) => {
+  // "1.5" used to read as 15: every separator was dropped, so a decimal typo became a ten-times-larger quantity.
+  it.each([
+    '',
+    'abc',
+    '12a',
+    '-5',
+    '1e3',
+    '9007199254740993',
+    '1.5',
+    '1,5',
+    '12.34',
+    '1.0000',
+    '1..000',
+    '1.000,5',
+    '.000',
+  ])('rejects %j as a whole number', (text) => {
     expect(parseWholeNumber(text)).toBeNull();
   });
 
@@ -90,6 +105,40 @@ describe('parsing what people type', () => {
   it.each(['', 'abc', '1,2,3', '1.2.3', '1,1234567', '-5'])('rejects money %j', (text) => {
     expect(parseDecimalAmount(text)).toBeNull();
   });
+});
+
+describe('grouping what people typed once they leave the box', () => {
+  it.each([
+    ['1000000', '1.000.000'],
+    ['1,000,000', '1.000.000'],
+    ['  250 ', '250'],
+  ])('groups the whole number %j as %j', (text, expected) => {
+    expect(groupWholeInput(text)).toBe(expected);
+  });
+
+  it.each([['12a'], ['1.5'], ['']])('leaves %j alone so its error still shows', (text) => {
+    expect(groupWholeInput(text)).toBe(text);
+  });
+
+  it.each([
+    ['25000', '25.000'],
+    ['25000,5', '25.000,5'],
+    ['25.000,50', '25.000,50'],
+    ['0,5', '0,5'],
+  ])('groups the amount %j as %j', (text, expected) => {
+    expect(groupDecimalInput(text)).toBe(expected);
+  });
+
+  it.each([['abc'], ['1,2,3'], ['']])('leaves the invalid amount %j alone', (text) => {
+    expect(groupDecimalInput(text)).toBe(text);
+  });
+
+  it.each(['25000', '25000,5', '25.000,50', '0,5', '1000000', '25.5'])(
+    'never changes the amount the API receives for %j',
+    (text) => {
+      expect(parseDecimalAmount(groupDecimalInput(text))).toBe(parseDecimalAmount(text));
+    },
+  );
 });
 
 describe('dates', () => {

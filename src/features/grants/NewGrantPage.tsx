@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { PreviewChecks } from '@/components/checks/PreviewChecks';
+import { PreviewChecks, SubmitStatus } from '@/components/checks/PreviewChecks';
 import { Note } from '@/components/ui/Alert';
 import { Button, ButtonLink } from '@/components/ui/Button';
 import { Field, Input, Select, StaticValue } from '@/components/ui/Field';
@@ -17,7 +17,7 @@ import { RoleGate, useCompany } from '@/lib/company';
 import { cn } from '@/lib/cn';
 import { formatDate } from '@/lib/format/date';
 import { formatInt } from '@/lib/format/number';
-import { parseDecimalAmount, parseWholeNumber } from '@/lib/format/parse';
+import { groupDecimalInput, groupWholeInput, parseDecimalAmount, parseWholeNumber } from '@/lib/format/parse';
 import { useMessages } from '@/lib/i18n';
 import { companyHref } from '@/lib/routes';
 import { enums, frequencyLabel, label } from '@/messages/enums';
@@ -204,6 +204,7 @@ function Form({ form }: { form: GrantForm }) {
                 inputMode="numeric"
                 value={s.quantity}
                 onChange={(e) => set('quantity', e.target.value)}
+                onBlur={() => set('quantity', groupWholeInput(s.quantity))}
                 invalid={Boolean(err('quantity', s.quantity !== ''))}
               />
             </Field>
@@ -214,6 +215,7 @@ function Form({ form }: { form: GrantForm }) {
                   inputMode="decimal"
                   value={s.strike}
                   onChange={(e) => set('strike', e.target.value)}
+                  onBlur={() => set('strike', groupDecimalInput(s.strike))}
                   invalid={Boolean(err('strikePrice', s.strike !== ''))}
                 />
               </Field>
@@ -322,6 +324,12 @@ function Form({ form }: { form: GrantForm }) {
             </fieldset>
           )}
 
+          <SubmitStatus
+            checks={check.preview?.checks}
+            checking={check.isChecking}
+            canSubmit={check.canSubmit}
+            localErrors={Object.keys(local).length > 0}
+          />
           <div className="flex justify-end gap-2.5 border-t border-slate-200 pt-4">
             <ButtonLink href={companyHref('dashboard', companyId)} variant="secondary">
               {m.common.action.cancel}
@@ -337,7 +345,7 @@ function Form({ form }: { form: GrantForm }) {
         </form>
       </Card>
 
-      <aside className="flex min-w-[300px] flex-[1_1_380px] flex-col gap-4">
+      <aside className="flex min-w-[300px] flex-[1_1_380px] flex-col gap-4 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto">
         <Card className="flex flex-col gap-4 px-6 py-5">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-[17px] font-bold">{t.previewTitle}</h2>

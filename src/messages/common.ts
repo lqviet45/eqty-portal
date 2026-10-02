@@ -12,6 +12,7 @@ export const common = {
     import: 'Nhập từ Excel',
     members: 'Thành viên',
     settings: 'Cài đặt',
+    group: { ledger: 'Sổ cái', record: 'Ghi nhận', admin: 'Quản trị' },
     operator: 'Người vận hành',
     monitor: 'Giám sát',
     portfolio: 'Danh mục của tôi',

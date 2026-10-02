@@ -332,8 +332,8 @@ export function StakeholdersPage() {
         actions={canWrite && <Button onClick={() => setPanel({ mode: 'add' })}>{t.add}</Button>}
       />
 
-      <div className="flex flex-wrap items-center gap-2.5">
-        <label className="flex h-11 min-w-[260px] flex-1 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-slate-600">
+      <div className="grid grid-cols-2 items-center gap-2.5 sm:flex sm:flex-wrap">
+        <label className="col-span-2 flex h-11 min-w-0 flex-1 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-slate-600 sm:min-w-[260px]">
           <span className="whitespace-nowrap">{t.search}</span>
           <input
             type="search"
@@ -349,7 +349,7 @@ export function StakeholdersPage() {
           aria-label={t.filterRelationship}
           value={relationship}
           onChange={(e) => setRelationship(e.target.value)}
-          className="w-auto min-w-[180px]"
+          className="w-full min-w-0 sm:w-auto sm:min-w-[180px]"
         >
           <option value="">{t.allRelationships}</option>
           {RELATIONSHIPS.map((r) => (
@@ -362,13 +362,14 @@ export function StakeholdersPage() {
           aria-label={t.filterEmployment}
           value={employment}
           onChange={(e) => setEmployment(e.target.value)}
-          className="w-auto min-w-[180px]"
+          className="w-full min-w-0 sm:w-auto sm:min-w-[180px]"
         >
           <option value="">{t.allEmployment}</option>
           <option value="ACTIVE">{enums.employment.ACTIVE}</option>
           <option value="TERMINATED">{enums.employment.TERMINATED}</option>
         </Select>
         <AsOfDateField
+          className="col-span-2 sm:col-span-1"
           label={m.common.asOfDate}
           value={asOfDate || query.data?.asOfDate || ''}
           onChange={setAsOfDate}
@@ -380,15 +381,21 @@ export function StakeholdersPage() {
           <Async query={query}>
             {(data) =>
               data.items.length === 0 ? (
-                <EmptyState>{data.totalCount === 0 ? t.empty : m.common.state.noMatch}</EmptyState>
+                <EmptyState
+                  action={
+                    data.totalCount === 0 &&
+                    canWrite && <Button onClick={() => setPanel({ mode: 'add' })}>{t.add}</Button>
+                  }
+                >
+                  {data.totalCount === 0 ? t.empty : m.common.state.noMatch}
+                </EmptyState>
               ) : (
                 <>
                   <TableWrap>
-                    <table className="eqty-table">
+                    <table className="eqty-table eqty-table--stack">
                       <thead>
                         <tr>
                           <th>{t.colHolder}</th>
-                          <th>{t.colKind}</th>
                           <th>{t.colRelationship}</th>
                           <th className="text-right">{t.colOutstanding}</th>
                           <th className="text-right">{t.colAwards}</th>
@@ -403,20 +410,25 @@ export function StakeholdersPage() {
                           const selected = panel && panel.mode !== 'add' && panel.row.id === row.id;
                           return (
                             <tr key={row.id} className={selected ? 'bg-teal-50' : undefined}>
-                              <td className="whitespace-nowrap">
+                              <td className="stack-title whitespace-nowrap">
                                 <div className="font-semibold">{row.displayName}</div>
-                                <div className="text-[13px] text-slate-600">{row.email ?? '—'}</div>
+                                <div className="text-[13px] text-slate-600">
+                                  {row.email ?? '—'} · {label(m.enums.stakeholderKind, row.kind)}
+                                </div>
                               </td>
-                              <td className="whitespace-nowrap text-slate-600">
-                                {label(m.enums.stakeholderKind, row.kind)}
-                              </td>
-                              <td className="whitespace-nowrap text-slate-600">
+                              <td data-label={t.colRelationship} className="whitespace-nowrap text-slate-600">
                                 {label(m.enums.relationship, row.relationship)}
                               </td>
-                              <td className="num">{formatCount(row.outstandingShares)}</td>
-                              <td className="num">{formatCount(row.grantedAwards)}</td>
-                              <td className="num font-semibold">{formatPercentPlain(row.fullyDilutedPercent)}</td>
-                              <td className="whitespace-nowrap">
+                              <td data-label={t.colOutstanding} className="num">
+                                {formatCount(row.outstandingShares)}
+                              </td>
+                              <td data-label={t.colAwards} className="num">
+                                {formatCount(row.grantedAwards)}
+                              </td>
+                              <td data-label={t.colPercent} className="num font-semibold">
+                                {formatPercentPlain(row.fullyDilutedPercent)}
+                              </td>
+                              <td data-label={t.colStatus} className="whitespace-nowrap">
                                 <Badge tone={row.employment.status === 'ACTIVE' ? 'success' : 'neutral'}>
                                   {row.employment.status === 'TERMINATED' && row.employment.terminationDate
                                     ? t.terminatedOn(formatDate(row.employment.terminationDate))
@@ -424,7 +436,7 @@ export function StakeholdersPage() {
                                 </Badge>
                               </td>
                               {showAccount && (
-                                <td className="whitespace-nowrap text-slate-600">
+                                <td data-label={t.colAccount} className="whitespace-nowrap text-slate-600">
                                   {row.account
                                     ? row.account.status === 'MEMBER' && row.account.role
                                       ? label(m.enums.role, row.account.role)
@@ -432,7 +444,7 @@ export function StakeholdersPage() {
                                     : '—'}
                                 </td>
                               )}
-                              <td className="text-right whitespace-nowrap">
+                              <td className="stack-actions text-right whitespace-nowrap">
                                 {row.actions.edit && (
                                   <RowButton onClick={() => setPanel({ mode: 'edit', row })}>
                                     {m.common.action.edit}

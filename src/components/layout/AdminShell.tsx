@@ -18,8 +18,13 @@ type CompanyNavKey =
   'dashboard' | 'capTable' | 'stakeholders' | 'transactions' | 'equity' | 'ledger' | 'import' | 'members' | 'settings';
 type NavKey = CompanyNavKey | 'monitor';
 
-const MAIN: CompanyNavKey[] = ['dashboard', 'capTable', 'stakeholders', 'transactions', 'equity', 'ledger', 'import'];
-const ADMIN: CompanyNavKey[] = ['members', 'settings'];
+// Grouped by what the person is doing (reading the ledger, writing to it, running the company) so a nine-item
+// list reads as three short ones; a group none of whose screens the role may open is dropped.
+const GROUPS: { key: 'ledger' | 'record' | 'admin'; routes: CompanyNavKey[] }[] = [
+  { key: 'ledger', routes: ['dashboard', 'capTable', 'stakeholders', 'equity', 'ledger'] },
+  { key: 'record', routes: ['transactions', 'import'] },
+  { key: 'admin', routes: ['members', 'settings'] },
+];
 
 function NavLink({
   route,
@@ -60,9 +65,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     void accountUrl().then(setAccount, () => setAccount(null));
   }, []);
 
-  const visible = (keys: CompanyNavKey[]) => keys.filter((key) => ROUTE_ROLES[key].includes(company.role));
-  const main = visible(MAIN);
-  const admin = visible(ADMIN);
+  const groups = GROUPS.map((group) => ({
+    key: group.key,
+    routes: group.routes.filter((key) => ROUTE_ROLES[key].includes(company.role)),
+  })).filter((group) => group.routes.length > 0);
   const isActive = (route: RouteKey) =>
     pathname.startsWith(ROUTES[route]) || (route === 'equity' && pathname.startsWith(ROUTES.newGrant));
 
@@ -71,22 +77,24 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="px-3 pt-1 pb-6">
         <Logo tone="light" />
       </div>
-      <nav aria-label={m.common.nav.label} className="flex flex-col gap-1">
-        {main.map((key) => (
-          <NavLink key={key} route={key} active={isActive(key)} onNavigate={onNavigate} />
-        ))}
-        {admin.length > 0 && <div className="bg-sidebar-active my-3 h-px" />}
-        {admin.map((key) => (
-          <NavLink key={key} route={key} active={isActive(key)} onNavigate={onNavigate} />
+      <nav aria-label={m.common.nav.label} className="flex flex-col gap-4">
+        {groups.map((group) => (
+          <div key={group.key} className="flex flex-col gap-1">
+            <div className="px-3 pb-1 text-[11px] tracking-[.08em] text-slate-400 uppercase">
+              {m.common.nav.group[group.key]}
+            </div>
+            {group.routes.map((key) => (
+              <NavLink key={key} route={key} active={isActive(key)} onNavigate={onNavigate} />
+            ))}
+          </div>
         ))}
         {auth.user?.isPlatformAdmin && (
-          <>
-            <div className="bg-sidebar-active my-3 h-px" />
+          <div className="flex flex-col gap-1">
             <div className="px-3 pb-1 text-[11px] tracking-[.08em] text-slate-400 uppercase">
               {m.common.nav.operator}
             </div>
             <NavLink route="monitor" active={isActive('monitor')} onNavigate={onNavigate} />
-          </>
+          </div>
         )}
       </nav>
 

@@ -1,15 +1,24 @@
 // Turns what a person typed into what the API takes. Both return null for input that is not a clean number,
 // so a form can leave the field empty in the request and let the server's check say what is missing.
 
+import { formatDecimalString, formatInt } from './number';
+
 const MAX_SAFE = Number.MAX_SAFE_INTEGER;
 
-/** "1.000.000", "1,000,000" or "1000000" → 1000000. Whole numbers only. */
+// Plain digits, or groups of exactly three after the first with one separator used throughout.
+const WHOLE_NUMBER = /^(?:\d+|\d{1,3}(?:\.\d{3})+|\d{1,3}(?:,\d{3})+|\d{1,3}(?: \d{3})+)$/;
+
+/**
+ * "1.000.000", "1,000,000", "1 000 000" or "1000000" → 1000000. Whole numbers only: anything that is not
+ * a clean grouping ("1.5", "12.34") is null, because dropping its separators would silently change the
+ * quantity ("1.5" would become 15).
+ */
 export function parseWholeNumber(text: string): number | null {
-  const cleaned = text.replace(/[\s.,]/g, '');
-  if (!/^\d+$/.test(cleaned)) {
+  const trimmed = text.trim();
+  if (!WHOLE_NUMBER.test(trimmed)) {
     return null;
   }
-  const value = Number(cleaned);
+  const value = Number(trimmed.replace(/[\s.,]/g, ''));
   return Number.isSafeInteger(value) && value <= MAX_SAFE ? value : null;
 }
 
@@ -54,4 +63,19 @@ export function parseDecimalAmount(text: string): string | null {
   }
   const normalized = whole.replace(/^0+(?=\d)/, '');
   return fraction === '' ? normalized : `${normalized}.${fraction}`;
+}
+
+/**
+ * What a quantity box shows once the person leaves it: "1000000" → "1.000.000". Text that is not a clean
+ * number is left alone so the field's error still points at what was typed.
+ */
+export function groupWholeInput(text: string): string {
+  const value = parseWholeNumber(text);
+  return value === null ? text : formatInt(value);
+}
+
+/** Same for money: "25000,5" → "25.000,5". Reads back to the same amount through parseDecimalAmount. */
+export function groupDecimalInput(text: string): string {
+  const amount = parseDecimalAmount(text);
+  return amount === null ? text : formatDecimalString(amount);
 }

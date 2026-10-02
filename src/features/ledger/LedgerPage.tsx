@@ -201,12 +201,12 @@ export function LedgerPage() {
     <RoleGate route="ledger">
       <PageHeader title={t.title} subtitle={first ? t.subtitle(company.name, first.totalCount) : company.name} />
 
-      <div className="flex flex-wrap items-center gap-2.5">
+      <div className="grid grid-cols-2 items-center gap-2.5 sm:flex sm:flex-wrap">
         <Select
           aria-label={t.filterType}
           value={group}
           onChange={(e) => setGroup(e.target.value)}
-          className="w-auto min-w-[190px]"
+          className="w-full min-w-0 sm:w-auto sm:min-w-[190px]"
         >
           <option value="">{t.allTypes}</option>
           <option value="shares">{t.groupShares}</option>
@@ -219,7 +219,7 @@ export function LedgerPage() {
           aria-label={t.filterStakeholder}
           value={stakeholderId}
           onChange={(e) => setStakeholderId(e.target.value)}
-          className="w-auto min-w-[190px]"
+          className="w-full min-w-0 sm:w-auto sm:min-w-[190px]"
         >
           <option value="">{t.allStakeholders}</option>
           {people.data?.items.map((p) => (
@@ -228,7 +228,7 @@ export function LedgerPage() {
             </option>
           ))}
         </Select>
-        <label className="flex h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-slate-600">
+        <label className="col-span-2 flex h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-slate-600 sm:col-span-1">
           {t.from}
           <input
             type="date"
@@ -236,7 +236,7 @@ export function LedgerPage() {
             value={fromDate}
             max={toDate || undefined}
             onChange={(e) => setFromDate(e.target.value)}
-            className="bg-transparent font-semibold text-slate-900"
+            className="min-w-0 flex-1 bg-transparent font-semibold text-slate-900"
           />
           {t.to}
           <input
@@ -245,10 +245,11 @@ export function LedgerPage() {
             value={toDate}
             min={fromDate || undefined}
             onChange={(e) => setToDate(e.target.value)}
-            className="bg-transparent font-semibold text-slate-900"
+            className="min-w-0 flex-1 bg-transparent font-semibold text-slate-900"
           />
         </label>
         <Checkbox
+          className="col-span-2 sm:col-span-1"
           label={t.includeVoided}
           checked={includeVoided}
           onChange={(e) => setIncludeVoided(e.target.checked)}
@@ -270,7 +271,7 @@ export function LedgerPage() {
           ) : (
             <>
               <TableWrap>
-                <table className="eqty-table">
+                <table className="eqty-table eqty-table--stack">
                   <thead>
                     <tr>
                       <th>{t.colVersion}</th>
@@ -285,7 +286,7 @@ export function LedgerPage() {
                   <tbody>
                     {items.map((entry) => (
                       <tr key={entry.id} className={cn(entry.id === selectedId && 'bg-teal-50')}>
-                        <td>
+                        <td data-label={t.colVersion}>
                           <button
                             type="button"
                             onClick={() => setSelectedId(entry.id)}
@@ -295,17 +296,23 @@ export function LedgerPage() {
                             {entry.ledgerVersion}
                           </button>
                         </td>
-                        <td className="whitespace-nowrap">{groupRow(entry)}</td>
-                        <td className={cn(entry.voided && 'text-slate-500 line-through')}>
+                        <td data-label={t.colType} className="whitespace-nowrap">
+                          {groupRow(entry)}
+                        </td>
+                        <td className={cn('stack-title', entry.voided && 'text-slate-500 line-through')}>
                           {describeEntry(entry)}
                           {entry.note && <div className="text-[12.5px] text-slate-500 no-underline">{entry.note}</div>}
                         </td>
-                        <td className="font-mono text-[13px] whitespace-nowrap">{formatDate(entry.effectiveDate)}</td>
-                        <td className="text-[13px] whitespace-nowrap text-slate-600">
+                        <td data-label={t.colEffective} className="font-mono text-[13px] whitespace-nowrap">
+                          {formatDate(entry.effectiveDate)}
+                        </td>
+                        <td data-label={t.colRecorded} className="text-[13px] whitespace-nowrap text-slate-600">
                           {formatDateTime(entry.recordedAt)}
                         </td>
-                        <td className="whitespace-nowrap text-slate-600">{entry.recordedByName ?? '—'}</td>
-                        <td className="whitespace-nowrap">
+                        <td data-label={t.colRecordedBy} className="whitespace-nowrap text-slate-600">
+                          {entry.recordedByName ?? '—'}
+                        </td>
+                        <td data-label={t.colStatus} className="whitespace-nowrap">
                           {entry.voidedByVersion !== null ? (
                             <Badge tone="danger">{t.voidedBy(entry.voidedByVersion)}</Badge>
                           ) : entry.voidsVersion !== null ? (
