@@ -78,17 +78,8 @@ Trình duyệt: `EQTY_CHROMIUM_PATH` trỏ tới Chromium có sẵn; không đ�
    { "oidcAuthority": "https://auth.example.vn/realms/eqty", "oidcClientId": "eqty-portal", "apiBaseUrl": "" }
    ```
 
-3. Proxy phải thử file theo từng màn trước khi rơi về trang chủ, nếu không tải lại trang sâu sẽ về `/`:
-
-   ```nginx
-   location / {
-       root /var/www/eqty;
-       try_files $uri $uri/index.html /index.html;
-   }
-   ```
-
-   Caddy: `try_files {path} {path}/index.html /index.html`. Cấu hình hiện tại của backend (`try_files $uri /index.html`) cần đổi một dòng này.
-
+3. Không cần sửa proxy: cấu hình hiện tại của backend (`try_files $uri /index.html`) chạy được. Khi proxy trả trang chủ cho một đường dẫn không phải file (tải lại `/cap-table/`, link lời mời `/invite?…`, `/auth/callback/?…`),
+   trang chủ chuyển ngay tới file của đường dẫn đó (`/cap-table/index.html?…`) và giữ nguyên query (`src/lib/entryFallback.ts`). Đổi sang `try_files $uri $uri/index.html /index.html;` (Caddy: `try_files {path} {path}/index.html /index.html`) chỉ để địa chỉ trên thanh trình duyệt đẹp hơn, không bắt buộc.
 4. Client `eqty-portal` trong Keycloak phải cho phép `https://app.<domain>/*` làm redirect và post-logout redirect URI (realm production đã khai).
 
 Link lời mời trong email là `<PortalBaseUrl>/invite?companyId=…&token=…` (`Email:PortalBaseUrl` của Worker = origin của app này).

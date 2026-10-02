@@ -1,13 +1,12 @@
-'use client';
+import { HomeRedirect } from '@/features/home/HomeRedirect';
+import { ENTRY_FALLBACK_SCRIPT } from '@/lib/entryFallback';
 
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { LoadingState } from '@/components/ui/States';
-import { PICKER_PATH } from '@/lib/routes';
-
-// The picker decides where to go (one company opens straight away) and asks for sign-in if needed.
-export default function HomePage() {
-  const router = useRouter();
-  useEffect(() => router.replace(PICKER_PATH), [router]);
-  return <LoadingState />;
+// The proxy answers unknown paths with this page; the script sends them to their own exported file.
+export default function Page() {
+  return (
+    <>
+      <script dangerouslySetInnerHTML={{ __html: ENTRY_FALLBACK_SCRIPT }} />
+      <HomeRedirect />
+    </>
+  );
 }

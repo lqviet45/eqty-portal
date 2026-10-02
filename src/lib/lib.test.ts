@@ -4,6 +4,7 @@ import { ledgerVersionOf } from '@/lib/api/hooks';
 import { errorFor, failedFieldErrors } from '@/lib/checks';
 import { parseConfig } from '@/lib/config';
 import { describeCode, describeError } from '@/lib/i18n';
+import { ENTRY_FALLBACK_SCRIPT, entryFallbackTarget } from '@/lib/entryFallback';
 import { describeEntry, groupOf } from '@/lib/ledger/describe';
 import { ROUTE_ROLES, companyHref, homeRouteOf, safeReturnTo } from '@/lib/routes';
 import { frequencyLabel, humanize, label } from '@/messages/enums';
@@ -172,5 +173,27 @@ describe('ETag', () => {
     expect(ledgerVersionOf('W/"7"')).toBe(7);
     expect(ledgerVersionOf(null)).toBeNull();
     expect(ledgerVersionOf('abc')).toBeNull();
+  });
+});
+
+describe('entry fallback (proxy answers every unknown path with the home page)', () => {
+  const at = (pathname: string, search = '', hash = '') => entryFallbackTarget({ pathname, search, hash });
+
+  it('sends a page path to its exported file and keeps the query (invitation token, OIDC code)', () => {
+    expect(at('/dashboard/', '?c=1')).toBe('/dashboard/index.html?c=1');
+    expect(at('/invite', '?companyId=1&token=t')).toBe('/invite/index.html?companyId=1&token=t');
+    expect(at('/auth/callback/', '?code=x&state=y', '#f')).toBe('/auth/callback/index.html?code=x&state=y#f');
+  });
+
+  it('leaves the home page and real files alone', () => {
+    expect(at('/')).toBeNull();
+    expect(at('/index.html')).toBeNull();
+    expect(at('/dashboard/index.html', '?c=1')).toBeNull();
+    expect(at('/config.json')).toBeNull();
+  });
+
+  it('inlines the same rule for the home page', () => {
+    expect(ENTRY_FALLBACK_SCRIPT).toContain('index.html');
+    expect(ENTRY_FALLBACK_SCRIPT.startsWith('(')).toBe(true);
   });
 });
