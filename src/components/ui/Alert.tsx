@@ -34,7 +34,7 @@ export function Alert({
       <Icon name={icon} size={18} className="mt-0.5 shrink-0" />
       <div className="min-w-0 flex-1">
         {title && <div className="font-semibold">{title}</div>}
-        {children && <div className={cn(title && 'mt-0.5')}>{children}</div>}
+        {children && <div className={cn(Boolean(title) && 'mt-0.5')}>{children}</div>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>

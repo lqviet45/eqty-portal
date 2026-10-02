@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { accountUrl } from '@/lib/auth/session';
 import { useCompany } from '@/lib/company';
 import { useMessages } from '@/lib/i18n';
-import { PICKER_PATH, companyHref } from '@/lib/routes';
+import { CHOOSE_PATH, companyHref } from '@/lib/routes';
 import { Logo } from './Logo';
 
 /** Mobile-first frame for employees: greeting + company switch on top, three tabs at the bottom. */
@@ -40,7 +40,7 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
           <Link
-            href={PICKER_PATH}
+            href={CHOOSE_PATH}
             aria-label={m.common.nav.switchCompany}
             className="flex min-h-11 max-w-44 items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 text-[13px] font-semibold text-slate-900 hover:bg-slate-50 hover:text-slate-900"
           >

@@ -1,11 +1,21 @@
 import { ApiError } from '@/lib/api/errors';
 import { checkTitles, errorMessages } from '@/messages/codes';
 import { common } from '@/messages/common';
+import { capTable } from '@/messages/capTable';
+import { companies } from '@/messages/companies';
+import { dashboard } from '@/messages/dashboard';
+import { preview } from '@/messages/preview';
+import { stakeholders } from '@/messages/stakeholders';
+import { transactions } from '@/messages/transactions';
+import { equity } from '@/messages/equity';
+import { ledger } from '@/messages/ledger';
+import { grants } from '@/messages/grants';
+import { employee } from '@/messages/employee';
 import { enums } from '@/messages/enums';
 
 // Vietnamese is the only locale today. Components read text through useMessages() so adding English means
 // a second catalog with the same shape, not edits across screens.
-export const vi = { common, enums };
+export const vi = { common, enums, employee, companies, dashboard, capTable, preview, stakeholders, transactions, equity, ledger, grants };
 export type Messages = typeof vi;
 
 export function useMessages(): Messages {

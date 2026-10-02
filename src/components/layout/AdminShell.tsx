@@ -11,7 +11,7 @@ import { accountUrl } from '@/lib/auth/session';
 import { useCompany } from '@/lib/company';
 import { label } from '@/messages/enums';
 import { useMessages } from '@/lib/i18n';
-import { PICKER_PATH, ROUTES, ROUTE_ROLES, companyHref, type RouteKey } from '@/lib/routes';
+import { CHOOSE_PATH, ROUTES, ROUTE_ROLES, companyHref, type RouteKey } from '@/lib/routes';
 import { Logo } from './Logo';
 
 type NavKey = 'dashboard' | 'capTable' | 'stakeholders' | 'transactions' | 'equity' | 'ledger' | 'import' | 'members' | 'settings';
@@ -75,7 +75,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           </div>
           <div className="mt-1 flex items-center gap-2">
             <Badge tone="brand">{label(m.enums.role, company.role)}</Badge>
-            <Link href={PICKER_PATH} onClick={onNavigate} className="text-[13px] text-teal-300 hover:text-white">
+            <Link href={CHOOSE_PATH} onClick={onNavigate} className="text-[13px] text-teal-300 hover:text-white">
               {m.common.nav.switchCompany}
             </Link>
           </div>
@@ -101,11 +101,9 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const m = useMessages();
-  const pathname = usePathname();
   const { company } = useCompany();
   const [open, setOpen] = useState(false);
 
-  useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     if (!open) {
       return;

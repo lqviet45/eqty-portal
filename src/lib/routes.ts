@@ -18,6 +18,8 @@ export const ROUTES = {
 export type RouteKey = keyof typeof ROUTES;
 
 export const PICKER_PATH = '/companies/';
+/** The picker without auto-opening a lone company: for the explicit "switch company" action. */
+export const CHOOSE_PATH = '/companies/?choose=1';
 export const NEW_COMPANY_PATH = '/companies/new/';
 
 export function companyHref(route: RouteKey, companyId: string, params: Record<string, string | null | undefined> = {}): string {

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ApiError } from '@/lib/api/errors';
+import type { ApiError } from '@/lib/api/errors';
 import type { ApiQuery } from '@/lib/api/hooks';
 import { describeError, useMessages } from '@/lib/i18n';
 import { Alert } from './Alert';
