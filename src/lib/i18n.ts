@@ -20,7 +20,25 @@ import { enums } from '@/messages/enums';
 
 // Vietnamese is the only locale today. Components read text through useMessages() so adding English means
 // a second catalog with the same shape, not edits across screens.
-export const vi = { common, enums, employee, companies, dashboard, capTable, preview, stakeholders, transactions, equity, ledger, grants, portfolio, members, settings, invite, import: importMessages };
+export const vi = {
+  common,
+  enums,
+  employee,
+  companies,
+  dashboard,
+  capTable,
+  preview,
+  stakeholders,
+  transactions,
+  equity,
+  ledger,
+  grants,
+  portfolio,
+  members,
+  settings,
+  invite,
+  import: importMessages,
+};
 export type Messages = typeof vi;
 
 export function useMessages(): Messages {
@@ -38,15 +56,27 @@ export interface ErrorText {
 /** Rewords an API error for people: our sentence for the code, the server's detail kept as secondary text. */
 export function describeError(error: unknown): ErrorText {
   if (!(error instanceof ApiError)) {
-    return { message: 'Đã xảy ra lỗi không mong đợi.', detail: error instanceof Error ? error.message : null, traceId: null };
+    return {
+      message: 'Đã xảy ra lỗi không mong đợi.',
+      detail: error instanceof Error ? error.message : null,
+      traceId: null,
+    };
   }
   const known = errorMessages[error.code];
   if (known) {
     const detail = error.status === 0 || error.message === known ? null : error.message;
-    return { message: known, detail: error.code === 'RATE_LIMITED' ? retryHint(error) : detail, traceId: error.traceId };
+    return {
+      message: known,
+      detail: error.code === 'RATE_LIMITED' ? retryHint(error) : detail,
+      traceId: error.traceId,
+    };
   }
   const title = checkTitles[error.code];
-  return { message: title ?? error.message, detail: title && error.message !== title ? error.message : null, traceId: error.traceId };
+  return {
+    message: title ?? error.message,
+    detail: title && error.message !== title ? error.message : null,
+    traceId: error.traceId,
+  };
 }
 
 function retryHint(error: ApiError): string | null {

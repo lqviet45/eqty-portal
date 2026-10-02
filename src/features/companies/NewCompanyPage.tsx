@@ -34,7 +34,12 @@ function Form() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    const body: CreateCompanyRequest = { name: name.trim(), entityType, currency, incorporationDate: incorporationDate || null };
+    const body: CreateCompanyRequest = {
+      name: name.trim(),
+      entityType,
+      currency,
+      incorporationDate: incorporationDate || null,
+    };
     const response = await write.run<Company>('/api/v1/companies', body, { keepCache: true });
     if (response) {
       await client.invalidateQueries({ queryKey: PICKER_KEY });
@@ -54,7 +59,13 @@ function Form() {
         <WriteError error={write.error} />
         <form onSubmit={submit} className="flex flex-col gap-4">
           <Field label={m.companies.name} error={write.fieldErrors.name}>
-            <Input value={name} onChange={(e) => setName(e.target.value)} required maxLength={200} invalid={Boolean(write.fieldErrors.name)} />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              maxLength={200}
+              invalid={Boolean(write.fieldErrors.name)}
+            />
           </Field>
           <Field label={m.companies.entityType} error={write.fieldErrors.entityType}>
             <Select value={entityType} onChange={(e) => setEntityType(e.target.value as EntityType)}>
@@ -72,11 +83,18 @@ function Form() {
               ))}
             </Select>
           </Field>
-          <Field label={m.companies.incorporationDate} hint={m.companies.incorporationHint} error={write.fieldErrors.incorporationDate}>
+          <Field
+            label={m.companies.incorporationDate}
+            hint={m.companies.incorporationHint}
+            error={write.fieldErrors.incorporationDate}
+          >
             <Input type="date" value={incorporationDate} onChange={(e) => setIncorporationDate(e.target.value)} />
           </Field>
           <div className="flex justify-end gap-2.5 border-t border-slate-200 pt-4">
-            <Link href={CHOOSE_PATH} className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-4 font-semibold text-slate-900 hover:text-slate-900">
+            <Link
+              href={CHOOSE_PATH}
+              className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-4 font-semibold text-slate-900 hover:text-slate-900"
+            >
               {m.common.action.cancel}
             </Link>
             <Button type="submit" loading={write.pending} disabled={name.trim() === ''}>

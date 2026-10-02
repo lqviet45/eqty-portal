@@ -41,12 +41,22 @@ function VoidForm({ entry, onDone }: { entry: LedgerEntryRow; onDone: () => void
   const write = useWrite(companyId);
   const [reason, setReason] = useState('');
 
-  const check = usePreview<{ reason: string }, VoidPreview>(companyId, `/bff/v1/companies/${companyId}/ledger/${entry.id}/void:preview`, { reason: reason.trim() });
+  const check = usePreview<{ reason: string }, VoidPreview>(
+    companyId,
+    `/bff/v1/companies/${companyId}/ledger/${entry.id}/void:preview`,
+    { reason: reason.trim() },
+  );
   const fields = failedFieldErrors(check.preview?.checks);
   const impact = check.preview?.impact;
 
   async function confirm() {
-    if (await write.run(`/api/v1/companies/${companyId}/ledger-entries/${entry.id}:void`, { reason: reason.trim() }, { ifMatch: check.ledgerVersion })) {
+    if (
+      await write.run(
+        `/api/v1/companies/${companyId}/ledger-entries/${entry.id}:void`,
+        { reason: reason.trim() },
+        { ifMatch: check.ledgerVersion },
+      )
+    ) {
       toast.success(t.voided);
       onDone();
     }
@@ -55,19 +65,32 @@ function VoidForm({ entry, onDone }: { entry: LedgerEntryRow; onDone: () => void
   return (
     <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-3.5 border-t border-slate-200 pt-4">
       <WriteError error={write.error} onReload={() => write.reset()} />
-      <Field label={t.reason} error={errorFor('reason', write.fieldErrors) ?? (reason.trim() ? errorFor('reason', fields) : undefined)}>
+      <Field
+        label={t.reason}
+        error={errorFor('reason', write.fieldErrors) ?? (reason.trim() ? errorFor('reason', fields) : undefined)}
+      >
         <Textarea value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} rows={3} />
       </Field>
       <PreviewChecks bare checks={check.preview?.checks} checking={check.isChecking} />
       {impact && (
         <p className="text-[13px] text-slate-600">
-          {t.impact(formatInt(impact.outstandingBefore), formatInt(impact.outstandingAfter), formatInt(impact.fullyDilutedBefore), formatInt(impact.fullyDilutedAfter), formatDate(impact.date))}
+          {t.impact(
+            formatInt(impact.outstandingBefore),
+            formatInt(impact.outstandingAfter),
+            formatInt(impact.fullyDilutedBefore),
+            formatInt(impact.fullyDilutedAfter),
+            formatDate(impact.date),
+          )}
         </p>
       )}
       <Note>{t.voidNote}</Note>
       <div className="flex flex-wrap gap-2.5">
-        <Button variant="danger" onClick={() => void confirm()} loading={write.pending} disabled={!check.canSubmit}>{t.confirmVoid}</Button>
-        <Button variant="secondary" onClick={onDone}>{m.common.action.cancel}</Button>
+        <Button variant="danger" onClick={() => void confirm()} loading={write.pending} disabled={!check.canSubmit}>
+          {t.confirmVoid}
+        </Button>
+        <Button variant="secondary" onClick={onDone}>
+          {m.common.action.cancel}
+        </Button>
       </div>
     </form>
   );
@@ -92,7 +115,9 @@ function Detail({ entry }: { entry: LedgerEntryRow }) {
   return (
     <aside className="flex min-w-[300px] flex-[0_1_400px] flex-col gap-4 rounded-xl border border-slate-200 bg-white px-6 py-5">
       <div className="flex flex-col gap-1">
-        <div className="text-xs font-semibold tracking-wider text-slate-600 uppercase">{t.entry(entry.ledgerVersion)}</div>
+        <div className="text-xs font-semibold tracking-wider text-slate-600 uppercase">
+          {t.entry(entry.ledgerVersion)}
+        </div>
         <h2 className="text-lg font-bold">{label(m.enums.ledgerType, entry.type)}</h2>
         <div className="text-slate-700">{describeEntry(entry)}</div>
       </div>
@@ -109,13 +134,19 @@ function Detail({ entry }: { entry: LedgerEntryRow }) {
           <VoidForm key={entry.id} entry={entry} onDone={() => setVoiding(false)} />
         ) : (
           <>
-            <Button variant="dangerOutline" onClick={() => setVoiding(true)}>{t.startVoid}</Button>
+            <Button variant="dangerOutline" onClick={() => setVoiding(true)}>
+              {t.startVoid}
+            </Button>
             <div className="text-[12.5px] text-slate-500">{t.voidOnlyAdmin}</div>
           </>
         )
       ) : (
         <Note>
-          {entry.voidsVersion !== null ? t.cannotVoidVoid : entry.voidedByVersion !== null ? t.alreadyVoided(entry.voidedByVersion) : t.voidOnlyAdmin}
+          {entry.voidsVersion !== null
+            ? t.cannotVoidVoid
+            : entry.voidedByVersion !== null
+              ? t.alreadyVoided(entry.voidedByVersion)
+              : t.voidOnlyAdmin}
         </Note>
       )}
     </aside>
@@ -133,13 +164,25 @@ export function LedgerPage() {
   const [includeVoided, setIncludeVoided] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const people = useApiQuery<Stakeholders>(['c', companyId, 'stakeholders-options'], `/bff/v1/companies/${companyId}/stakeholders`);
-  const filters = { type: TYPE_GROUPS[group] ?? '', stakeholderId, fromDate, toDate, includeVoided: includeVoided ? 'true' : 'false' };
+  const people = useApiQuery<Stakeholders>(
+    ['c', companyId, 'stakeholders-options'],
+    `/bff/v1/companies/${companyId}/stakeholders`,
+  );
+  const filters = {
+    type: TYPE_GROUPS[group] ?? '',
+    stakeholderId,
+    fromDate,
+    toDate,
+    includeVoided: includeVoided ? 'true' : 'false',
+  };
 
   const query = useInfiniteQuery({
     queryKey: [...companyKey(companyId), 'ledger', filters],
     queryFn: ({ pageParam, signal }) =>
-      api.get<LedgerScreen>(`/bff/v1/companies/${companyId}/ledger`, { query: { ...filters, pageSize: PAGE_SIZE, pageToken: pageParam }, signal }),
+      api.get<LedgerScreen>(`/bff/v1/companies/${companyId}/ledger`, {
+        query: { ...filters, pageSize: PAGE_SIZE, pageToken: pageParam },
+        signal,
+      }),
     initialPageParam: '',
     getNextPageParam: (last) => last.data.nextPageToken ?? undefined,
   });
@@ -150,14 +193,21 @@ export function LedgerPage() {
   const selected = items.find((entry) => entry.id === selectedId) ?? null;
   const dateInvalid = fromDate !== '' && toDate !== '' && fromDate > toDate;
 
-  const groupRow = (entry: LedgerEntryRow) => <Badge tone={GROUP_TONE[groupOf(entry.type)]}>{label(m.enums.ledgerType, entry.type)}</Badge>;
+  const groupRow = (entry: LedgerEntryRow) => (
+    <Badge tone={GROUP_TONE[groupOf(entry.type)]}>{label(m.enums.ledgerType, entry.type)}</Badge>
+  );
 
   return (
     <RoleGate route="ledger">
       <PageHeader title={t.title} subtitle={first ? t.subtitle(company.name, first.totalCount) : company.name} />
 
       <div className="flex flex-wrap items-center gap-2.5">
-        <Select aria-label={t.filterType} value={group} onChange={(e) => setGroup(e.target.value)} className="w-auto min-w-[190px]">
+        <Select
+          aria-label={t.filterType}
+          value={group}
+          onChange={(e) => setGroup(e.target.value)}
+          className="w-auto min-w-[190px]"
+        >
           <option value="">{t.allTypes}</option>
           <option value="shares">{t.groupShares}</option>
           <option value="price">{t.groupPrice}</option>
@@ -165,19 +215,44 @@ export function LedgerPage() {
           <option value="grants">{t.groupGrants}</option>
           <option value="void">{t.groupVoid}</option>
         </Select>
-        <Select aria-label={t.filterStakeholder} value={stakeholderId} onChange={(e) => setStakeholderId(e.target.value)} className="w-auto min-w-[190px]">
+        <Select
+          aria-label={t.filterStakeholder}
+          value={stakeholderId}
+          onChange={(e) => setStakeholderId(e.target.value)}
+          className="w-auto min-w-[190px]"
+        >
           <option value="">{t.allStakeholders}</option>
           {people.data?.items.map((p) => (
-            <option key={p.id} value={p.id}>{p.displayName}</option>
+            <option key={p.id} value={p.id}>
+              {p.displayName}
+            </option>
           ))}
         </Select>
         <label className="flex h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-slate-600">
           {t.from}
-          <input type="date" aria-label={t.fromLabel} value={fromDate} max={toDate || undefined} onChange={(e) => setFromDate(e.target.value)} className="bg-transparent font-semibold text-slate-900" />
+          <input
+            type="date"
+            aria-label={t.fromLabel}
+            value={fromDate}
+            max={toDate || undefined}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="bg-transparent font-semibold text-slate-900"
+          />
           {t.to}
-          <input type="date" aria-label={t.toLabel} value={toDate} min={fromDate || undefined} onChange={(e) => setToDate(e.target.value)} className="bg-transparent font-semibold text-slate-900" />
+          <input
+            type="date"
+            aria-label={t.toLabel}
+            value={toDate}
+            min={fromDate || undefined}
+            onChange={(e) => setToDate(e.target.value)}
+            className="bg-transparent font-semibold text-slate-900"
+          />
         </label>
-        <Checkbox label={t.includeVoided} checked={includeVoided} onChange={(e) => setIncludeVoided(e.target.checked)} />
+        <Checkbox
+          label={t.includeVoided}
+          checked={includeVoided}
+          onChange={(e) => setIncludeVoided(e.target.checked)}
+        />
       </div>
 
       <div className="flex flex-wrap items-start gap-5">
@@ -185,9 +260,13 @@ export function LedgerPage() {
           {query.isPending ? (
             <LoadingState />
           ) : query.error ? (
-            <div className="p-4"><ErrorState error={query.error} onRetry={() => void query.refetch()} /></div>
+            <div className="p-4">
+              <ErrorState error={query.error} onRetry={() => void query.refetch()} />
+            </div>
           ) : items.length === 0 ? (
-            <p className="px-5 py-10 text-center text-slate-600">{dateInvalid || first?.totalCount ? m.common.state.noMatch : t.empty}</p>
+            <p className="px-5 py-10 text-center text-slate-600">
+              {dateInvalid || first?.totalCount ? m.common.state.noMatch : t.empty}
+            </p>
           ) : (
             <>
               <TableWrap>
@@ -207,7 +286,12 @@ export function LedgerPage() {
                     {items.map((entry) => (
                       <tr key={entry.id} className={cn(entry.id === selectedId && 'bg-teal-50')}>
                         <td>
-                          <button type="button" onClick={() => setSelectedId(entry.id)} aria-label={t.viewEntry(entry.ledgerVersion)} className="min-h-11 min-w-11 font-mono font-semibold text-brand">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedId(entry.id)}
+                            aria-label={t.viewEntry(entry.ledgerVersion)}
+                            className="text-brand min-h-11 min-w-11 font-mono font-semibold"
+                          >
                             {entry.ledgerVersion}
                           </button>
                         </td>
@@ -217,7 +301,9 @@ export function LedgerPage() {
                           {entry.note && <div className="text-[12.5px] text-slate-500 no-underline">{entry.note}</div>}
                         </td>
                         <td className="font-mono text-[13px] whitespace-nowrap">{formatDate(entry.effectiveDate)}</td>
-                        <td className="text-[13px] whitespace-nowrap text-slate-600">{formatDateTime(entry.recordedAt)}</td>
+                        <td className="text-[13px] whitespace-nowrap text-slate-600">
+                          {formatDateTime(entry.recordedAt)}
+                        </td>
                         <td className="whitespace-nowrap text-slate-600">{entry.recordedByName ?? '—'}</td>
                         <td className="whitespace-nowrap">
                           {entry.voidedByVersion !== null ? (
@@ -236,7 +322,13 @@ export function LedgerPage() {
               <div className="flex items-center justify-between gap-3 border-t border-slate-200 px-4 py-3 text-[13px] text-slate-600">
                 <span>{t.showing(items.length, first?.matchedCount ?? items.length)}</span>
                 {query.hasNextPage && (
-                  <Button variant="secondary" onClick={() => void query.fetchNextPage()} loading={query.isFetchingNextPage}>{m.common.action.loadMore}</Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => void query.fetchNextPage()}
+                    loading={query.isFetchingNextPage}
+                  >
+                    {m.common.action.loadMore}
+                  </Button>
                 )}
               </div>
             </>

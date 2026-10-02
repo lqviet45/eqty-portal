@@ -15,7 +15,12 @@ export function AsOfDateField({
   max?: string;
 }) {
   return (
-    <label className={cn('flex h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] text-slate-600', className)}>
+    <label
+      className={cn(
+        'flex h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] text-slate-600',
+        className,
+      )}
+    >
       <span className="whitespace-nowrap">{label}</span>
       <input
         type="date"

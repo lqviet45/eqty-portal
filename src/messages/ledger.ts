@@ -1,6 +1,7 @@
 export const ledger = {
   title: 'Nhật ký sổ cái',
-  subtitle: (company: string, count: number) => `${company} · ${count} bút toán · sổ cái chỉ thêm, sửa sai bằng bút toán đảo`,
+  subtitle: (company: string, count: number) =>
+    `${company} · ${count} bút toán · sổ cái chỉ thêm, sửa sai bằng bút toán đảo`,
   filterType: 'Lọc theo loại',
   filterStakeholder: 'Lọc theo cổ đông',
   allTypes: 'Mọi loại bút toán',
@@ -41,7 +42,8 @@ export const ledger = {
   startVoid: 'Đảo bút toán…',
   voidOnlyAdmin: 'Chỉ Owner và Admin. Viewer chỉ xem.',
   reason: 'Lý do (bắt buộc, tối đa 500 ký tự)',
-  voidNote: 'Bút toán gốc vẫn nằm trong sổ cái, được đánh dấu đã đảo. Hệ thống ghi thêm một bút toán đảo và tính lại cap table như chưa có bút toán gốc.',
+  voidNote:
+    'Bút toán gốc vẫn nằm trong sổ cái, được đánh dấu đã đảo. Hệ thống ghi thêm một bút toán đảo và tính lại cap table như chưa có bút toán gốc.',
   confirmVoid: 'Xác nhận đảo',
   voided: 'Đã đảo bút toán.',
   impact: (outBefore: string, outAfter: string, fdBefore: string, fdAfter: string, date: string) =>

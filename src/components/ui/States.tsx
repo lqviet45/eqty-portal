@@ -26,7 +26,13 @@ export function ErrorState({ error, onRetry, title }: { error: unknown; onRetry?
       tone="error"
       live
       title={title ?? m.common.error.title}
-      actions={onRetry && <Button variant="secondary" onClick={onRetry}>{m.common.action.retry}</Button>}
+      actions={
+        onRetry && (
+          <Button variant="secondary" onClick={onRetry}>
+            {m.common.action.retry}
+          </Button>
+        )
+      }
     >
       <p>{text.message}</p>
       {text.detail && <p className="mt-1 text-[13px] opacity-80">{text.detail}</p>}
@@ -67,11 +73,21 @@ export function WriteError({ error, onReload }: { error: ApiError | null; onRelo
       tone="error"
       live
       title={stale ? m.common.error.stale : undefined}
-      actions={stale && onReload ? <Button variant="secondary" onClick={onReload}>{m.common.action.reload}</Button> : undefined}
+      actions={
+        stale && onReload ? (
+          <Button variant="secondary" onClick={onReload}>
+            {m.common.action.reload}
+          </Button>
+        ) : undefined
+      }
     >
       <p>{text.message}</p>
       {text.detail && <p className="mt-1 text-[13px] opacity-80">{text.detail}</p>}
-      {text.traceId && <p className="mt-1 font-mono text-xs opacity-70">{m.common.error.traceId}: {text.traceId}</p>}
+      {text.traceId && (
+        <p className="mt-1 font-mono text-xs opacity-70">
+          {m.common.error.traceId}: {text.traceId}
+        </p>
+      )}
     </Alert>
   );
 }

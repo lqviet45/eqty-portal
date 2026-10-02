@@ -2,7 +2,8 @@ export const grants = {
   title: 'Cấp grant mới',
   breadcrumbParent: 'Quỹ ESOP & lớp CP',
   recipient: 'Người nhận',
-  recipientOption: (name: string, relationship: string, active: string) => `${name} — ${relationship}${active ? ` · đang có ${active}` : ''}`,
+  recipientOption: (name: string, relationship: string, active: string) =>
+    `${name} — ${relationship}${active ? ` · đang có ${active}` : ''}`,
   awardType: 'Loại',
   pool: 'Lấy từ quỹ',
   poolOption: (name: string, available: string) => `${name} — còn ${available}`,

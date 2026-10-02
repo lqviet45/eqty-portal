@@ -1,8 +1,14 @@
-import { forwardRef, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import {
+  forwardRef,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from 'react';
 import { cn } from '@/lib/cn';
 
 const control =
-  'h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-[14.5px] font-normal text-slate-900 placeholder:text-slate-400 disabled:bg-slate-100 disabled:text-slate-500';
+  'h-11 rounded-lg border border-slate-300 bg-white px-3 text-[14.5px] font-normal text-slate-900 placeholder:text-slate-400 disabled:bg-slate-100 disabled:text-slate-500';
 const invalidControl = 'border-red-500 focus-visible:outline-red-600';
 
 interface FieldProps {
@@ -33,10 +39,10 @@ interface ControlProps {
   invalid?: boolean;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement> & ControlProps & { numeric?: boolean }>(function Input(
-  { invalid, numeric, className, ...props },
-  ref,
-) {
+export const Input = forwardRef<
+  HTMLInputElement,
+  InputHTMLAttributes<HTMLInputElement> & ControlProps & { numeric?: boolean }
+>(function Input({ invalid, numeric, className, ...props }, ref) {
   return (
     <input
       ref={ref}
@@ -47,33 +53,43 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
   );
 });
 
-export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement> & ControlProps>(function Select(
-  { invalid, className, ...props },
-  ref,
-) {
-  return <select ref={ref} aria-invalid={invalid || undefined} className={cn(control, invalid && invalidControl, className)} {...props} />;
-});
+export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement> & ControlProps>(
+  function Select({ invalid, className, ...props }, ref) {
+    return (
+      <select
+        ref={ref}
+        aria-invalid={invalid || undefined}
+        className={cn(control, invalid && invalidControl, className)}
+        {...props}
+      />
+    );
+  },
+);
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement> & ControlProps>(function Textarea(
-  { invalid, className, ...props },
-  ref,
-) {
-  return (
-    <textarea
-      ref={ref}
-      aria-invalid={invalid || undefined}
-      className={cn(control, 'h-auto min-h-24 py-2.5', invalid && invalidControl, className)}
-      {...props}
-    />
-  );
-});
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement> & ControlProps>(
+  function Textarea({ invalid, className, ...props }, ref) {
+    return (
+      <textarea
+        ref={ref}
+        aria-invalid={invalid || undefined}
+        className={cn(control, 'h-auto min-h-24 py-2.5', invalid && invalidControl, className)}
+        {...props}
+      />
+    );
+  },
+);
 
 /** A read-only value shaped like an input (for values that cannot change, e.g. entity type). */
 export function StaticValue({ label, children, mono }: { label: ReactNode; children: ReactNode; mono?: boolean }) {
   return (
     <div className="flex flex-col gap-1.5 text-[13px] font-semibold text-slate-700">
       {label}
-      <div className={cn('flex h-11 items-center rounded-lg bg-slate-100 px-3 text-[14.5px] font-normal text-slate-600', mono && 'font-mono')}>
+      <div
+        className={cn(
+          'flex h-11 items-center rounded-lg bg-slate-100 px-3 text-[14.5px] font-normal text-slate-600',
+          mono && 'font-mono',
+        )}
+      >
         {children}
       </div>
     </div>

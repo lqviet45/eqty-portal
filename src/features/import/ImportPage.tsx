@@ -40,8 +40,21 @@ const STATUS_TONE: Record<ImportStatus, Tone> = {
   CANCELLED: 'neutral',
 };
 
-function Stage({ tone, title, children }: { tone: 'brand' | 'info' | 'warning' | 'danger'; title: string; children: ReactNode }) {
-  const border = { brand: 'border-t-brand', info: 'border-t-cyan-700', warning: 'border-t-amber-700', danger: 'border-t-red-700' }[tone];
+function Stage({
+  tone,
+  title,
+  children,
+}: {
+  tone: 'brand' | 'info' | 'warning' | 'danger';
+  title: string;
+  children: ReactNode;
+}) {
+  const border = {
+    brand: 'border-t-brand',
+    info: 'border-t-cyan-700',
+    warning: 'border-t-amber-700',
+    danger: 'border-t-red-700',
+  }[tone];
   return (
     <Card className={cn('flex max-w-3xl flex-col gap-3 border-t-4 px-6 py-5', border)}>
       <h2 className="text-lg font-bold">{title}</h2>
@@ -99,22 +112,47 @@ function Uploader({ screen }: { screen: ImportScreen }) {
   return (
     <div className="flex flex-col gap-3">
       <WriteError error={write.error} />
-      {localError && <Alert tone="error" live>{localError}</Alert>}
+      {localError && (
+        <Alert tone="error" live>
+          {localError}
+        </Alert>
+      )}
       <div
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        className={cn('flex flex-col items-center gap-3 rounded-[10px] border-2 border-dashed px-5 py-8 text-center text-slate-600', dragging ? 'border-brand bg-brand-tint' : 'border-slate-300')}
+        className={cn(
+          'flex flex-col items-center gap-3 rounded-[10px] border-2 border-dashed px-5 py-8 text-center text-slate-600',
+          dragging ? 'border-brand bg-brand-tint' : 'border-slate-300',
+        )}
       >
         <div>{t.dropHint}</div>
         <div className="text-[13px]">{t.limits(formatBytes(maxFileBytes), formatInt(maxRowsPerSheet))}</div>
-        <input ref={input} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" className="sr-only" id="import-file" onChange={(e) => void upload(e.target.files?.[0])} />
-        <Button onClick={() => input.current?.click()} loading={write.pending} disabled={!screen.actions.upload}>{t.chooseFile}</Button>
+        <input
+          ref={input}
+          type="file"
+          accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          className="sr-only"
+          id="import-file"
+          onChange={(e) => void upload(e.target.files?.[0])}
+        />
+        <Button onClick={() => input.current?.click()} loading={write.pending} disabled={!screen.actions.upload}>
+          {t.chooseFile}
+        </Button>
       </div>
       {screen.actions.downloadTemplate && (
         <div>
-          <button type="button" onClick={() => void template()} className="text-[13.5px] font-semibold text-brand">{t.downloadTemplate}</button>
-          {templateError && <span className="ml-3 text-[13px] text-red-700">{t.templateFailed}: {templateError}</span>}
+          <button type="button" onClick={() => void template()} className="text-brand text-[13.5px] font-semibold">
+            {t.downloadTemplate}
+          </button>
+          {templateError && (
+            <span className="ml-3 text-[13px] text-red-700">
+              {t.templateFailed}: {templateError}
+            </span>
+          )}
         </div>
       )}
     </div>
@@ -160,7 +198,9 @@ function Issues({ screen }: { screen: ImportScreen }) {
           </TableWrap>
         </Card>
       ))}
-      {current && current.issueCount > current.issues.length && <p className="text-[13px] text-slate-600">{t.firstIssues(current.issues.length, current.issueCount)}</p>}
+      {current && current.issueCount > current.issues.length && (
+        <p className="text-[13px] text-slate-600">{t.firstIssues(current.issues.length, current.issueCount)}</p>
+      )}
     </>
   );
 }
@@ -175,7 +215,7 @@ function ImportView({ screen }: { screen: ImportScreen }) {
 
   async function act(kind: 'commit' | 'cancel') {
     if (!current) return;
-    if (await write.run(`/api/v1/companies/${companyId}/imports/${current.id}:${kind}`, {}) && kind === 'cancel') {
+    if ((await write.run(`/api/v1/companies/${companyId}/imports/${current.id}:${kind}`, {})) && kind === 'cancel') {
       toast.success(t.cancelled);
     }
   }
@@ -195,31 +235,58 @@ function ImportView({ screen }: { screen: ImportScreen }) {
 
   let body: ReactNode;
   if (screen.state === 'COMPANY_NOT_EMPTY') {
-    body = <Stage tone="warning" title={t.notEmptyTitle}><p className="text-sm text-slate-600">{t.notEmptyBody}</p></Stage>;
+    body = (
+      <Stage tone="warning" title={t.notEmptyTitle}>
+        <p className="text-sm text-slate-600">{t.notEmptyBody}</p>
+      </Stage>
+    );
   } else if (screen.state === 'COMPLETED') {
     body = (
       <Stage tone="brand" title={t.completedTitle(current?.cutOffDate ? formatDate(current.cutOffDate) : null)}>
         <p className="text-sm text-slate-600">{t.completedBody}</p>
-        <div><ButtonLink href={companyHref('capTable', companyId)} variant="secondary">{t.viewCapTable}</ButtonLink></div>
+        <div>
+          <ButtonLink href={companyHref('capTable', companyId)} variant="secondary">
+            {t.viewCapTable}
+          </ButtonLink>
+        </div>
       </Stage>
     );
-  } else if (!current || screen.state === 'READY' || current.status === 'REJECTED' || current.status === 'FAILED' || current.status === 'CANCELLED') {
+  } else if (
+    !current ||
+    screen.state === 'READY' ||
+    current.status === 'REJECTED' ||
+    current.status === 'FAILED' ||
+    current.status === 'CANCELLED'
+  ) {
     body = (
       <>
         {current?.status === 'REJECTED' && (
           <>
-            <Alert tone="error" live title={t.rejectedTitle(current.issueCount)}>{t.rejectedBody}</Alert>
+            <Alert tone="error" live title={t.rejectedTitle(current.issueCount)}>
+              {t.rejectedBody}
+            </Alert>
             <Issues screen={screen} />
           </>
         )}
-        {current?.status === 'FAILED' && <Alert tone="error" live title={t.failedTitle}>{current.failure ? describeCode(current.failure.code) : t.failedBody}</Alert>}
-        <Stage tone="brand" title={current ? t.uploadFixed : t.readyTitle}><Uploader screen={screen} /></Stage>
+        {current?.status === 'FAILED' && (
+          <Alert tone="error" live title={t.failedTitle}>
+            {current.failure ? describeCode(current.failure.code) : t.failedBody}
+          </Alert>
+        )}
+        <Stage tone="brand" title={current ? t.uploadFixed : t.readyTitle}>
+          <Uploader screen={screen} />
+        </Stage>
       </>
     );
   } else if (current.status === 'UPLOADED' || current.status === 'VALIDATING') {
     body = (
-      <Stage tone="info" title={current.status === 'UPLOADED' ? t.uploadedTitle(current.fileName) : t.validatingTitle(current.fileName)}>
-        <div className="h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-2 w-1/2 animate-pulse bg-cyan-700" /></div>
+      <Stage
+        tone="info"
+        title={current.status === 'UPLOADED' ? t.uploadedTitle(current.fileName) : t.validatingTitle(current.fileName)}
+      >
+        <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+          <div className="h-2 w-1/2 animate-pulse bg-cyan-700" />
+        </div>
         <p className="text-[13px] text-slate-600">{t.validatingBody}</p>
       </Stage>
     );
@@ -237,8 +304,16 @@ function ImportView({ screen }: { screen: ImportScreen }) {
         </dl>
         <p className="text-[12.5px] text-slate-500">{t.summaryNote}</p>
         <div className="flex flex-wrap gap-2.5">
-          <Button onClick={() => void act('commit')} loading={write.pending} disabled={!screen.actions.confirm}>{t.confirm}</Button>
-          <Button variant="secondary" onClick={() => void act('cancel')} disabled={!screen.actions.cancel || write.pending}>{t.cancel}</Button>
+          <Button onClick={() => void act('commit')} loading={write.pending} disabled={!screen.actions.confirm}>
+            {t.confirm}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => void act('cancel')}
+            disabled={!screen.actions.cancel || write.pending}
+          >
+            {t.cancel}
+          </Button>
         </div>
       </Stage>
     );
@@ -249,14 +324,22 @@ function ImportView({ screen }: { screen: ImportScreen }) {
       </Stage>
     );
   } else {
-    body = <Stage tone="brand" title={t.readyTitle}><Uploader screen={screen} /></Stage>;
+    body = (
+      <Stage tone="brand" title={t.readyTitle}>
+        <Uploader screen={screen} />
+      </Stage>
+    );
   }
 
   return (
     <>
       <ol aria-label={t.stepsLabel} className="flex flex-wrap gap-2 text-[13px]">
         {screen.steps.map((step) => (
-          <li key={step.key} className={cn('rounded-full px-3 py-1.5', STEP_STYLE[step.state])} aria-current={step.state === 'ACTIVE' ? 'step' : undefined}>
+          <li
+            key={step.key}
+            className={cn('rounded-full px-3 py-1.5', STEP_STYLE[step.state])}
+            aria-current={step.state === 'ACTIVE' ? 'step' : undefined}
+          >
             {t.steps[step.key]}
           </li>
         ))}
@@ -299,7 +382,8 @@ export function ImportPage() {
   const { companyId } = useCompany();
   const query = useApiQuery<ImportScreen>(['c', companyId, 'import'], `/bff/v1/companies/${companyId}/import`, {
     // The worker moves a file through UPLOADED → VALIDATING → …: ask again until a person is needed.
-    refetchInterval: (screen) => (screen?.state === 'IN_PROGRESS' && screen.current && POLLING.includes(screen.current.status) ? POLL_MS : false),
+    refetchInterval: (screen) =>
+      screen?.state === 'IN_PROGRESS' && screen.current && POLLING.includes(screen.current.status) ? POLL_MS : false,
   });
   return (
     <RoleGate route="import">

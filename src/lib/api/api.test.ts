@@ -36,7 +36,14 @@ describe('problem+json', () => {
         detail: 'Pool is over-allocated.',
         code: 'POOL_EXHAUSTED',
         traceId: '00-abc-01',
-        errors: [{ pointer: '#/vesting/cliffMonths', parameter: null, code: 'INVALID_VESTING_TERMS', detail: 'Cliff too long.' }],
+        errors: [
+          {
+            pointer: '#/vesting/cliffMonths',
+            parameter: null,
+            code: 'INVALID_VESTING_TERMS',
+            detail: 'Cliff too long.',
+          },
+        ],
       }),
       { status: 422, headers: { 'content-type': 'application/problem+json' } },
     );
@@ -57,7 +64,10 @@ describe('problem+json', () => {
 
   it('keeps Retry-After of a rate-limited call', async () => {
     const error = await problemFromResponse(
-      new Response(JSON.stringify({ status: 429, code: 'RATE_LIMITED' }), { status: 429, headers: { 'retry-after': '30' } }),
+      new Response(JSON.stringify({ status: 429, code: 'RATE_LIMITED' }), {
+        status: 429,
+        headers: { 'retry-after': '30' },
+      }),
     );
     expect(error.code).toBe('RATE_LIMITED');
     expect(error.retryAfterSeconds).toBe(30);

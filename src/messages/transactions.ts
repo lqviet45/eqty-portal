@@ -1,6 +1,7 @@
 export const transactions = {
   title: 'Ghi nhận giao dịch',
-  subtitle: (company: string, version: number) => `${company} · sổ cái v${version} · mọi giao dịch chỉ thêm vào sổ, sửa sai bằng bút toán đảo`,
+  subtitle: (company: string, version: number) =>
+    `${company} · sổ cái v${version} · mọi giao dịch chỉ thêm vào sổ, sửa sai bằng bút toán đảo`,
   tabsLabel: 'Loại giao dịch',
   tabIssue: 'Phát hành',
   tabTransfer: 'Chuyển nhượng',

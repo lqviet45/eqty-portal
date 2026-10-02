@@ -25,7 +25,13 @@ export class ApiError extends Error {
   readonly problem: Problem | null;
   readonly retryAfterSeconds: number | null;
 
-  constructor(init: { status: number; code: string; message: string; problem?: Problem | null; retryAfterSeconds?: number | null }) {
+  constructor(init: {
+    status: number;
+    code: string;
+    message: string;
+    problem?: Problem | null;
+    retryAfterSeconds?: number | null;
+  }) {
     super(init.message);
     this.name = 'ApiError';
     this.status = init.status;
@@ -104,7 +110,14 @@ function toFieldError(value: unknown): ProblemFieldError[] {
     return [];
   }
   const raw = value as Record<string, unknown>;
-  return [{ pointer: str(raw.pointer), parameter: str(raw.parameter), code: str(raw.code) ?? 'INVALID_VALUE', detail: str(raw.detail) ?? '' }];
+  return [
+    {
+      pointer: str(raw.pointer),
+      parameter: str(raw.parameter),
+      code: str(raw.code) ?? 'INVALID_VALUE',
+      detail: str(raw.detail) ?? '',
+    },
+  ];
 }
 
 function str(value: unknown): string | null {

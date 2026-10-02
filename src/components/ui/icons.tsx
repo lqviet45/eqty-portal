@@ -51,7 +51,11 @@ const paths = {
 
 export type IconName = keyof typeof paths;
 
-export function Icon({ name, size = 20, ...props }: { name: IconName; size?: number } & Omit<SVGProps<SVGSVGElement>, 'name'>) {
+export function Icon({
+  name,
+  size = 20,
+  ...props
+}: { name: IconName; size?: number } & Omit<SVGProps<SVGSVGElement>, 'name'>) {
   return (
     <svg
       width={size}

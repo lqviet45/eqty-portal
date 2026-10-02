@@ -8,7 +8,8 @@ export const invite = {
   expiresIn: (days: number, date: string) => (days > 0 ? `còn ${days} ngày (${date})` : `hôm nay (${date})`),
   stakeholder: 'Liên kết với',
   roleBody: {
-    EMPLOYEE: 'Với vai trò Nhân viên, bạn sẽ xem được quyền chọn cổ phần của chính mình: số đã vested, lịch vesting và giá trị ước tính. Bạn không thấy dữ liệu của người khác.',
+    EMPLOYEE:
+      'Với vai trò Nhân viên, bạn sẽ xem được quyền chọn cổ phần của chính mình: số đã vested, lịch vesting và giá trị ước tính. Bạn không thấy dữ liệu của người khác.',
     VIEWER: 'Với vai trò Viewer, bạn xem được cap table, sổ cái và báo cáo của công ty, nhưng không sửa được gì.',
     ADMIN: 'Với vai trò Admin, bạn ghi được sổ cái, nhập số dư từ Excel và mời Viewer, Nhân viên.',
     OWNER: 'Với vai trò Owner, bạn có toàn quyền với công ty này.',
@@ -26,6 +27,7 @@ export const invite = {
   toSignIn: 'Về trang đăng nhập',
   notFoundTitle: 'Link lời mời không hợp lệ',
   badLink: 'Link thiếu thông tin. Mở lại link trong email lời mời.',
-  mismatch: (signedIn: string, invited: string) => `Bạn đang đăng nhập bằng ${signedIn} nhưng lời mời gửi tới ${invited}.`,
+  mismatch: (signedIn: string, invited: string) =>
+    `Bạn đang đăng nhập bằng ${signedIn} nhưng lời mời gửi tới ${invited}.`,
   joined: (company: string) => `Bạn đã tham gia ${company}.`,
 } as const;

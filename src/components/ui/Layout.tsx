@@ -60,7 +60,17 @@ export function TableWrap({ children, className }: { children: ReactNode; classN
   return <div className={cn('overflow-x-auto', className)}>{children}</div>;
 }
 
-export function Kpi({ label, value, sub, children }: { label: ReactNode; value: ReactNode; sub?: ReactNode; children?: ReactNode }) {
+export function Kpi({
+  label,
+  value,
+  sub,
+  children,
+}: {
+  label: ReactNode;
+  value: ReactNode;
+  sub?: ReactNode;
+  children?: ReactNode;
+}) {
   return (
     <Card className="flex flex-col gap-1 px-5 py-4">
       <div className="text-[13px] text-slate-600">{label}</div>
@@ -71,7 +81,15 @@ export function Kpi({ label, value, sub, children }: { label: ReactNode; value: 
   );
 }
 
-export function ProgressBar({ percent, label, tone = 'brand' }: { percent: number; label: string; tone?: 'brand' | 'teal' }) {
+export function ProgressBar({
+  percent,
+  label,
+  tone = 'brand',
+}: {
+  percent: number;
+  label: string;
+  tone?: 'brand' | 'teal';
+}) {
   const clamped = Math.max(0, Math.min(100, percent));
   return (
     <div

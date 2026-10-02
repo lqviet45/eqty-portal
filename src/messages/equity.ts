@@ -25,7 +25,8 @@ export const equity = {
   total: 'Tổng',
   noPools: 'Chưa có quỹ ESOP nào.',
   noClasses: 'Chưa có lớp cổ phần nào. Tạo lớp đầu tiên để bắt đầu phát hành.',
-  appendOnlyNote: 'Lớp cổ phần và quỹ không xóa được: sổ cái chỉ thêm. Muốn bỏ một quỹ, điều chỉnh quy mô về mức đã cấp. Đổi số được phép có thể lùi ngày; hệ thống kiểm tra lại toàn bộ dòng thời gian.',
+  appendOnlyNote:
+    'Lớp cổ phần và quỹ không xóa được: sổ cái chỉ thêm. Muốn bỏ một quỹ, điều chỉnh quy mô về mức đã cấp. Đổi số được phép có thể lùi ngày; hệ thống kiểm tra lại toàn bộ dòng thời gian.',
   resizeTitle: 'Điều chỉnh quy mô quỹ',
   currentSize: 'Quy mô hiện tại',
   newSize: 'Quy mô mới',

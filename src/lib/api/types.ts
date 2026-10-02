@@ -40,14 +40,7 @@ export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'REVOKED' | 'EXPIRED';
 export type AccountStatus = 'NONE' | 'INVITED' | 'MEMBER';
 export type CompanyHome = 'DASHBOARD' | 'EMPLOYEE_PORTAL';
 export type ImportStatus =
-  | 'UPLOADED'
-  | 'VALIDATING'
-  | 'VALIDATED'
-  | 'REJECTED'
-  | 'COMMITTING'
-  | 'COMMITTED'
-  | 'FAILED'
-  | 'CANCELLED';
+  'UPLOADED' | 'VALIDATING' | 'VALIDATED' | 'REJECTED' | 'COMMITTING' | 'COMMITTED' | 'FAILED' | 'CANCELLED';
 export type ImportScreenState = 'READY' | 'IN_PROGRESS' | 'COMPLETED' | 'COMPANY_NOT_EMPTY';
 export type ImportStepState = 'PENDING' | 'ACTIVE' | 'DONE' | 'FAILED';
 export type ImportStepKey = 'UPLOAD' | 'VALIDATE' | 'CONFIRM' | 'WRITE';

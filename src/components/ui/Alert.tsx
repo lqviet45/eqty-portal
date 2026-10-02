@@ -30,7 +30,10 @@ export function Alert({
 }) {
   const { box, icon } = styles[tone];
   return (
-    <div role={live ? 'alert' : undefined} className={cn('flex flex-wrap items-start gap-3 rounded-xl border px-4 py-3 text-sm', box, className)}>
+    <div
+      role={live ? 'alert' : undefined}
+      className={cn('flex flex-wrap items-start gap-3 rounded-xl border px-4 py-3 text-sm', box, className)}
+    >
       <Icon name={icon} size={18} className="mt-0.5 shrink-0" />
       <div className="min-w-0 flex-1">
         {title && <div className="font-semibold">{title}</div>}
@@ -43,5 +46,7 @@ export function Alert({
 
 /** Quiet explanatory note under a form, as in the design ("Mỗi lần lưu được ghi vào lịch sử…"). */
 export function Note({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('rounded-lg bg-slate-50 px-3 py-2.5 text-[13px] text-slate-600', className)}>{children}</div>;
+  return (
+    <div className={cn('rounded-lg bg-slate-50 px-3 py-2.5 text-[13px] text-slate-600', className)}>{children}</div>
+  );
 }

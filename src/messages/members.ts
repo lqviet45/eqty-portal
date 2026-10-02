@@ -16,7 +16,8 @@ export const members = {
   role: 'Vai trò',
   stakeholder: 'Là cổ đông nào',
   stakeholderNone: 'Chọn cổ đông…',
-  stakeholderNote: 'Bắt buộc với vai trò Nhân viên: tài khoản sẽ chỉ thấy dữ liệu của cổ đông này. Lời mời hết hạn sau 7 ngày.',
+  stakeholderNote:
+    'Bắt buộc với vai trò Nhân viên: tài khoản sẽ chỉ thấy dữ liệu của cổ đông này. Lời mời hết hạn sau 7 ngày.',
   noLinkable: 'Mọi cổ đông đã có tài khoản hoặc lời mời. Thêm cổ đông mới ở màn Cổ đông.',
   send: 'Gửi lời mời',
   sent: (email: string) => `Đã gửi lời mời tới ${email}. Email có thể đến chậm vài giây.`,
@@ -29,7 +30,8 @@ export const members = {
   saveRole: 'Lưu vai trò',
   roleChanged: 'Đã đổi vai trò.',
   revokeTitle: 'Thu hồi quyền truy cập?',
-  revokeBody: (name: string) => `${name} sẽ mất quyền vào công ty ngay ở request kế tiếp. Lịch sử sổ cái của họ giữ nguyên.`,
+  revokeBody: (name: string) =>
+    `${name} sẽ mất quyền vào công ty ngay ở request kế tiếp. Lịch sử sổ cái của họ giữ nguyên.`,
   revokeInvitationTitle: 'Thu hồi lời mời?',
   revokeInvitationBody: (email: string) => `Link trong email gửi tới ${email} sẽ không dùng được nữa.`,
   memberRevoked: 'Đã thu hồi thành viên.',

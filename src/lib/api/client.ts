@@ -41,7 +41,13 @@ export function quoteEtag(version: number): string {
   return `"${version}"`;
 }
 
-async function send(method: string, path: string, body: unknown, options: RequestOptions, retried = false): Promise<Response> {
+async function send(
+  method: string,
+  path: string,
+  body: unknown,
+  options: RequestOptions,
+  retried = false,
+): Promise<Response> {
   const { apiBaseUrl } = await loadConfig();
   const headers = new Headers({ accept: 'application/json, application/problem+json' });
 
@@ -99,7 +105,12 @@ async function readJson<T>(response: Response): Promise<T> {
   return (text === '' ? undefined : JSON.parse(text)) as T;
 }
 
-export async function request<T>(method: string, path: string, body: unknown, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+export async function request<T>(
+  method: string,
+  path: string,
+  body: unknown,
+  options: RequestOptions = {},
+): Promise<ApiResponse<T>> {
   const response = await send(method, path, body, options);
   if (!response.ok) {
     throw await problemFromResponse(response);

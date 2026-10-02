@@ -22,7 +22,11 @@ export const PICKER_PATH = '/companies/';
 export const CHOOSE_PATH = '/companies/?choose=1';
 export const NEW_COMPANY_PATH = '/companies/new/';
 
-export function companyHref(route: RouteKey, companyId: string, params: Record<string, string | null | undefined> = {}): string {
+export function companyHref(
+  route: RouteKey,
+  companyId: string,
+  params: Record<string, string | null | undefined> = {},
+): string {
   const search = new URLSearchParams({ c: companyId });
   for (const [key, value] of Object.entries(params)) {
     if (value) {

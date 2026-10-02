@@ -25,16 +25,33 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 
-export function Button({ variant = 'primary', loading = false, className, children, disabled, type = 'button', ...props }: ButtonProps) {
+export function Button({
+  variant = 'primary',
+  loading = false,
+  className,
+  children,
+  disabled,
+  type = 'button',
+  ...props
+}: ButtonProps) {
   return (
-    <button type={type} className={buttonClass(variant, className)} disabled={disabled || loading} aria-busy={loading || undefined} {...props}>
+    <button
+      type={type}
+      className={buttonClass(variant, className)}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
       {loading && <Spinner size={16} />}
       {children}
     </button>
   );
 }
 
-interface ButtonLinkProps extends Omit<ComponentProps<typeof Link>, 'className' | 'children'>, Pick<AnchorHTMLAttributes<HTMLAnchorElement>, 'target' | 'rel'> {
+interface ButtonLinkProps
+  extends
+    Omit<ComponentProps<typeof Link>, 'className' | 'children'>,
+    Pick<AnchorHTMLAttributes<HTMLAnchorElement>, 'target' | 'rel'> {
   variant?: ButtonVariant;
   className?: string;
   children: ReactNode;
@@ -49,7 +66,12 @@ export function ButtonLink({ variant = 'primary', className, children, ...props 
 }
 
 /** Small text button used inside table rows ("Sửa", "Thu hồi"). */
-export function RowButton({ tone = 'brand', className, type = 'button', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { tone?: 'brand' | 'danger' }) {
+export function RowButton({
+  tone = 'brand',
+  className,
+  type = 'button',
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { tone?: 'brand' | 'danger' }) {
   return (
     <button
       type={type}

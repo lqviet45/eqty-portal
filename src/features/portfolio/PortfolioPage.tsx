@@ -20,7 +20,13 @@ import { frequencyLabel, label } from '@/messages/enums';
 const INITIAL_TIMELINE = 7;
 
 function Section({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <section className={cn('flex flex-col gap-2.5 rounded-[14px] border border-slate-200 bg-white p-[18px]', className)}>{children}</section>;
+  return (
+    <section
+      className={cn('flex flex-col gap-2.5 rounded-[14px] border border-slate-200 bg-white p-[18px]', className)}
+    >
+      {children}
+    </section>
+  );
 }
 
 function GrantCard({ grant, own, schedule }: { grant: PortfolioGrant; own: boolean; schedule: boolean }) {
@@ -46,9 +52,13 @@ function GrantCard({ grant, own, schedule }: { grant: PortfolioGrant; own: boole
     [t.start, formatDate(grant.vesting.startDate)],
     [t.cliffDuration, t.cliffDurationValue(grant.vesting.cliffMonths, grant.vesting.durationMonths)],
     [t.frequency, frequencyLabel(grant.vesting.frequencyMonths)],
-    ...(grant.exerciseWindowDays !== null ? ([[t.ifLeave, t.exerciseDays(grant.exerciseWindowDays)]] as [string, string][]) : []),
+    ...(grant.exerciseWindowDays !== null
+      ? ([[t.ifLeave, t.exerciseDays(grant.exerciseWindowDays)]] as [string, string][])
+      : []),
     ...(grant.terminationDate ? ([[t.terminatedOn, formatDate(grant.terminationDate)]] as [string, string][]) : []),
-    ...(grant.exerciseDeadlineDate ? ([[t.exerciseDeadline, formatDate(grant.exerciseDeadlineDate)]] as [string, string][]) : []),
+    ...(grant.exerciseDeadlineDate
+      ? ([[t.exerciseDeadline, formatDate(grant.exerciseDeadlineDate)]] as [string, string][])
+      : []),
     [t.status, label(m.enums.grantStatus, grant.status)],
     ...(grant.intrinsicValue ? ([[t.grantValue, formatMoney(grant.intrinsicValue)]] as [string, string][]) : []),
   ];
@@ -59,7 +69,11 @@ function GrantCard({ grant, own, schedule }: { grant: PortfolioGrant; own: boole
         <section className="flex flex-col gap-2.5 rounded-[14px] border border-amber-200 bg-amber-50 px-[18px] py-4">
           <div className="text-sm text-amber-950">{t.unaccepted(id)}</div>
           <WriteError error={write.error} />
-          {own && <Button onClick={() => void accept()} loading={write.pending}>{t.accept}</Button>}
+          {own && (
+            <Button onClick={() => void accept()} loading={write.pending}>
+              {t.accept}
+            </Button>
+          )}
         </section>
       )}
       {!schedule && (
@@ -76,27 +90,50 @@ function GrantCard({ grant, own, schedule }: { grant: PortfolioGrant; own: boole
         </Section>
       )}
       <Section className="gap-1">
-        <div className="mb-2 font-bold">{t.timelineTitle} · {id}</div>
+        <div className="mb-2 font-bold">
+          {t.timelineTitle} · {id}
+        </div>
         <ul>
           {shown.map((tranche) => (
-            <li key={tranche.vestingDate} className="grid grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-3 border-b border-slate-100 py-2 last:border-b-0">
+            <li
+              key={tranche.vestingDate}
+              className="grid grid-cols-[18px_minmax(0,1fr)_auto] items-center gap-3 border-b border-slate-100 py-2 last:border-b-0"
+            >
               <span
                 aria-hidden="true"
-                className={cn('block size-3 rounded-full', tranche.state === 'VESTED' ? 'bg-brand' : tranche.state === 'FORFEITED' ? 'bg-slate-300' : 'box-border border-2 border-slate-400')}
+                className={cn(
+                  'block size-3 rounded-full',
+                  tranche.state === 'VESTED'
+                    ? 'bg-brand'
+                    : tranche.state === 'FORFEITED'
+                      ? 'bg-slate-300'
+                      : 'box-border border-2 border-slate-400',
+                )}
               />
               <span className="flex flex-col">
                 <span className="font-mono text-[13px]">{formatDate(tranche.vestingDate)}</span>
                 <span className="text-xs text-slate-500">{label(m.enums.trancheState, tranche.state)}</span>
               </span>
               <span className="flex flex-col text-right">
-                <span className={cn('font-mono text-[13.5px] font-semibold', tranche.state === 'FORFEITED' && 'text-slate-400 line-through')}>{formatSignedInt(tranche.quantity)}</span>
+                <span
+                  className={cn(
+                    'font-mono text-[13.5px] font-semibold',
+                    tranche.state === 'FORFEITED' && 'text-slate-400 line-through',
+                  )}
+                >
+                  {formatSignedInt(tranche.quantity)}
+                </span>
                 <span className="font-mono text-xs text-slate-500">{formatInt(tranche.cumulativeQuantity)}</span>
               </span>
             </li>
           ))}
         </ul>
         {!schedule && grant.timeline.length > INITIAL_TIMELINE && (
-          <button type="button" onClick={() => setExpanded((v) => !v)} className="mt-2 self-start text-[13.5px] font-semibold text-brand">
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="text-brand mt-2 self-start text-[13.5px] font-semibold"
+          >
             {expanded ? t.showLess : t.showAll(grant.timeline.length)}
           </button>
         )}
@@ -123,10 +160,18 @@ function PortfolioView({ data, own }: { data: Portfolio; own: boolean }) {
             <div className="flex flex-col gap-0.5">
               <div className="text-[13px] text-slate-300">{t.vestedAt(formatDate(data.asOfDate))}</div>
               <div className="font-mono text-[34px] leading-tight font-bold tracking-tight">
-                {formatInt(totals.vestedQuantity)} <span className="text-base font-normal text-slate-400">/ {formatInt(totals.grantedQuantity)}</span>
+                {formatInt(totals.vestedQuantity)}{' '}
+                <span className="text-base font-normal text-slate-400">/ {formatInt(totals.grantedQuantity)}</span>
               </div>
             </div>
-            <div role="progressbar" aria-valuenow={Math.round(vestedBar)} aria-valuemin={0} aria-valuemax={100} aria-label={t.vestedAt(formatDate(data.asOfDate))} className="h-2.5 overflow-hidden rounded-full bg-slate-800">
+            <div
+              role="progressbar"
+              aria-valuenow={Math.round(vestedBar)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={t.vestedAt(formatDate(data.asOfDate))}
+              className="h-2.5 overflow-hidden rounded-full bg-slate-800"
+            >
               <div className="h-full bg-teal-400" style={{ width: `${vestedBar}%` }} />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -135,11 +180,19 @@ function PortfolioView({ data, own }: { data: Portfolio; own: boolean }) {
                 <div className="font-mono font-semibold">{formatInt(totals.unvestedQuantity)}</div>
               </div>
               <div>
-                <div className="text-xs text-slate-400">{data.nextTranche ? t.nextTranche(formatDate(data.nextTranche.vestingDate)) : t.nextTranche('—')}</div>
-                <div className="font-mono font-semibold text-teal-300">{data.nextTranche ? formatSignedInt(data.nextTranche.quantity) : '—'}</div>
+                <div className="text-xs text-slate-400">
+                  {data.nextTranche ? t.nextTranche(formatDate(data.nextTranche.vestingDate)) : t.nextTranche('—')}
+                </div>
+                <div className="font-mono font-semibold text-teal-300">
+                  {data.nextTranche ? formatSignedInt(data.nextTranche.quantity) : '—'}
+                </div>
               </div>
             </div>
-            {totals.forfeitedQuantity > 0 && <div className="text-[13px] text-slate-400">{t.forfeited}: {formatInt(totals.forfeitedQuantity)}</div>}
+            {totals.forfeitedQuantity > 0 && (
+              <div className="text-[13px] text-slate-400">
+                {t.forfeited}: {formatInt(totals.forfeitedQuantity)}
+              </div>
+            )}
           </section>
 
           <Section>
@@ -148,10 +201,16 @@ function PortfolioView({ data, own }: { data: Portfolio; own: boolean }) {
               <>
                 <div className="font-mono text-2xl font-bold">{formatMoney(value.vestedAwardsIntrinsicValue)}</div>
                 {data.shares.length > 0 && (
-                  <div className="text-[13px] text-slate-600">{t.sharesValue}: <strong className="font-mono">{formatMoney(value.sharesValue)}</strong></div>
+                  <div className="text-[13px] text-slate-600">
+                    {t.sharesValue}: <strong className="font-mono">{formatMoney(value.sharesValue)}</strong>
+                  </div>
                 )}
                 <div className="border-t border-slate-100 pt-2 text-xs text-slate-500">
-                  {t.disclaimer(formatMoney(value.pricePerShare.pricePerShare), formatDate(value.pricePerShare.effectiveDate), label(m.enums.priceSource, value.pricePerShare.source))}
+                  {t.disclaimer(
+                    formatMoney(value.pricePerShare.pricePerShare),
+                    formatDate(value.pricePerShare.effectiveDate),
+                    label(m.enums.priceSource, value.pricePerShare.source),
+                  )}
                 </div>
               </>
             ) : (
@@ -164,7 +223,10 @@ function PortfolioView({ data, own }: { data: Portfolio; own: boolean }) {
               <div className="font-bold">{t.sharesTitle}</div>
               <ul className="text-[13.5px]">
                 {data.shares.map((share) => (
-                  <li key={share.shareClassId} className="flex justify-between border-b border-slate-100 py-1.5 last:border-b-0">
+                  <li
+                    key={share.shareClassId}
+                    className="flex justify-between border-b border-slate-100 py-1.5 last:border-b-0"
+                  >
                     <span className="text-slate-600">{share.shareClassName}</span>
                     <span className="font-mono font-semibold">{formatInt(share.quantity)}</span>
                   </li>
@@ -175,8 +237,16 @@ function PortfolioView({ data, own }: { data: Portfolio; own: boolean }) {
         </>
       )}
 
-      {data.grants.length === 0 ? <Section><p className="text-slate-600">{t.noGrants}</p></Section> : data.grants.map((grant) => <GrantCard key={grant.id} grant={grant} own={own} schedule={schedule} />)}
-      <Badge tone="neutral" className="self-center">{label(m.enums.employment, data.stakeholder.employment.status)}</Badge>
+      {data.grants.length === 0 ? (
+        <Section>
+          <p className="text-slate-600">{t.noGrants}</p>
+        </Section>
+      ) : (
+        data.grants.map((grant) => <GrantCard key={grant.id} grant={grant} own={own} schedule={schedule} />)
+      )}
+      <Badge tone="neutral" className="self-center">
+        {label(m.enums.employment, data.stakeholder.employment.status)}
+      </Badge>
     </div>
   );
 }
@@ -186,12 +256,19 @@ export function PortfolioPage() {
   const { companyId, company } = useCompany();
   const stakeholderId = useSearchParams().get('s');
   const own = company.role === 'EMPLOYEE' || !stakeholderId;
-  const path = own ? `/bff/v1/companies/${companyId}/me/portfolio` : `/bff/v1/companies/${companyId}/stakeholders/${stakeholderId}/portfolio`;
+  const path = own
+    ? `/bff/v1/companies/${companyId}/me/portfolio`
+    : `/bff/v1/companies/${companyId}/stakeholders/${stakeholderId}/portfolio`;
   const query = useApiQuery<Portfolio>(['c', companyId, 'portfolio', own ? 'me' : stakeholderId], path);
 
   return (
     <RoleGate route="portfolio">
-      {company.role !== 'EMPLOYEE' && <PageHeader title={query.data ? m.portfolio.viewingFor(query.data.stakeholder.displayName) : m.portfolio.overallTitle} subtitle={company.name} />}
+      {company.role !== 'EMPLOYEE' && (
+        <PageHeader
+          title={query.data ? m.portfolio.viewingFor(query.data.stakeholder.displayName) : m.portfolio.overallTitle}
+          subtitle={company.name}
+        />
+      )}
       <Async query={query}>{(data) => <PortfolioView data={data} own={own} />}</Async>
     </RoleGate>
   );

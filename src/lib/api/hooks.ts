@@ -20,7 +20,13 @@ function asApiError(error: unknown): ApiError | null {
   if (error === null || error === undefined) {
     return null;
   }
-  return isApiError(error) ? error : new ApiError({ status: 0, code: 'REQUEST_FAILED', message: error instanceof Error ? error.message : String(error) });
+  return isApiError(error)
+    ? error
+    : new ApiError({
+        status: 0,
+        code: 'REQUEST_FAILED',
+        message: error instanceof Error ? error.message : String(error),
+      });
 }
 
 /** Query keys of everything that depends on one company's ledger start with this prefix. */
@@ -40,7 +46,10 @@ export function useApiQuery<T>(key: readonly unknown[], path: string, options: A
     queryKey: [...key, options.query ?? null],
     queryFn: ({ signal }) => api.get<T>(path, { query: options.query, signal }),
     enabled: options.enabled ?? true,
-    refetchInterval: typeof options.refetchInterval === 'function' ? (q) => (options.refetchInterval as (data: T | undefined) => number | false)(q.state.data?.data) : options.refetchInterval,
+    refetchInterval:
+      typeof options.refetchInterval === 'function'
+        ? (q) => (options.refetchInterval as (data: T | undefined) => number | false)(q.state.data?.data)
+        : options.refetchInterval,
     placeholderData: options.keepPrevious ? keepPreviousData : undefined,
   });
   return {
@@ -61,7 +70,10 @@ export type ApiQuery<T> = ReturnType<typeof useApiQuery<T>>;
 /** JSON.stringify(FormData) is "{}": fingerprint uploads by file identity so a different file never reuses a key. */
 function fingerprintBody(body: unknown): unknown {
   if (typeof FormData !== 'undefined' && body instanceof FormData) {
-    return Array.from(body.entries(), ([key, value]) => [key, value instanceof File ? `${value.name}:${value.size}:${value.lastModified}` : value]);
+    return Array.from(body.entries(), ([key, value]) => [
+      key,
+      value instanceof File ? `${value.name}:${value.size}:${value.lastModified}` : value,
+    ]);
   }
   return body;
 }
@@ -86,10 +98,15 @@ export function useWrite(companyId: string | null) {
   const [error, setError] = useState<ApiError | null>(null);
 
   const run = useCallback(
-    async <TResult = unknown>(path: string, body: unknown, options: WriteOptions = {}): Promise<ApiResponse<TResult> | null> => {
+    async <TResult = unknown>(
+      path: string,
+      body: unknown,
+      options: WriteOptions = {},
+    ): Promise<ApiResponse<TResult> | null> => {
       setPending(true);
       setError(null);
-      const idempotencyKey = options.idempotent === false ? undefined : keys.current.next({ path, body: fingerprintBody(body) });
+      const idempotencyKey =
+        options.idempotent === false ? undefined : keys.current.next({ path, body: fingerprintBody(body) });
       try {
         const response = await api.post<TResult>(path, body, { ifMatch: options.ifMatch, idempotencyKey });
         keys.current.settle();
@@ -126,7 +143,12 @@ interface PreviewResult {
  * answers 200 even for an incomplete form, so failures arrive as data (checks), not errors.
  * `canSubmit` is true only when the answer is for exactly what is on screen now.
  */
-export function usePreview<TRequest, TResponse extends PreviewResult>(companyId: string, path: string, body: TRequest | null, enabled = true) {
+export function usePreview<TRequest, TResponse extends PreviewResult>(
+  companyId: string,
+  path: string,
+  body: TRequest | null,
+  enabled = true,
+) {
   const debounced = useDebouncedValue(body, 300);
   const inSync = JSON.stringify(debounced) === JSON.stringify(body);
 

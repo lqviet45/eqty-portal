@@ -1,6 +1,7 @@
 export const importMessages = {
   title: 'Nhập số dư đầu kỳ từ Excel',
-  subtitle: 'Chỉ nhập được một lần, khi công ty còn trống. Mọi số dư được ghi vào ngày chốt trong template; không nhập lịch sử giao dịch.',
+  subtitle:
+    'Chỉ nhập được một lần, khi công ty còn trống. Mọi số dư được ghi vào ngày chốt trong template; không nhập lịch sử giao dịch.',
   stepsLabel: 'Các bước',
   steps: { UPLOAD: '1 · Tải file lên', VALIDATE: '2 · Kiểm tra', CONFIRM: '3 · Xác nhận', WRITE: '4 · Ghi sổ' },
   readyTitle: 'Chưa có file',
@@ -13,7 +14,8 @@ export const importMessages = {
   notXlsx: 'File phải là Excel .xlsx.',
   tooLarge: (size: string) => `File quá lớn (tối đa ${size}).`,
   validatingTitle: (name: string) => `Đang kiểm tra ${name}…`,
-  validatingBody: 'Hệ thống đọc cả file và kiểm tra từng dòng bằng đúng quy tắc của sổ cái. Có thể đóng trang, kết quả vẫn ở đây.',
+  validatingBody:
+    'Hệ thống đọc cả file và kiểm tra từng dòng bằng đúng quy tắc của sổ cái. Có thể đóng trang, kết quả vẫn ở đây.',
   uploadedTitle: (name: string) => `Đã nhận ${name}, đang chờ xử lý…`,
   validatedTitle: (date: string) => `File hợp lệ. Sẽ ghi vào ngày ${date}:`,
   summary: {
@@ -32,14 +34,18 @@ export const importMessages = {
   committingTitle: 'Đang ghi vào sổ cái…',
   committingBody: 'Không đóng được bước này giữa chừng: hoặc ghi đủ, hoặc không ghi gì. Nút xác nhận và huỷ bị khoá.',
   completedTitle: (date: string | null) => (date ? `Đã nhập xong số dư ngày ${date}` : 'Đã nhập xong'),
-  completedBody: 'Số dư đầu kỳ đã vào sổ cái, gắn nhãn lô nhập này để truy vết. Từ giờ ghi giao dịch bằng màn Ghi nhận giao dịch.',
+  completedBody:
+    'Số dư đầu kỳ đã vào sổ cái, gắn nhãn lô nhập này để truy vết. Từ giờ ghi giao dịch bằng màn Ghi nhận giao dịch.',
   viewCapTable: 'Xem cap table',
   notEmptyTitle: 'Công ty đã có dữ liệu',
-  notEmptyBody: 'Nhập từ Excel chỉ dùng một lần, khi công ty chưa có cổ đông hay bút toán nào. Thêm số liệu bằng các màn Cổ đông và Ghi nhận giao dịch.',
+  notEmptyBody:
+    'Nhập từ Excel chỉ dùng một lần, khi công ty chưa có cổ đông hay bút toán nào. Thêm số liệu bằng các màn Cổ đông và Ghi nhận giao dịch.',
   failedTitle: 'Không có gì được ghi',
-  failedBody: 'Ví dụ: có người thêm cổ đông vào công ty lúc bạn đang xác nhận. Kiểm tra lại dữ liệu công ty rồi tải file lên lại nếu vẫn cần.',
+  failedBody:
+    'Ví dụ: có người thêm cổ đông vào công ty lúc bạn đang xác nhận. Kiểm tra lại dữ liệu công ty rồi tải file lên lại nếu vẫn cần.',
   rejectedTitle: (count: number) => `File có ${count} lỗi: chưa có gì được ghi vào sổ cái`,
-  rejectedBody: 'Chỉ cần một dòng sai là cả file bị chặn. Sửa hết các lỗi dưới đây trong Excel rồi tải lại: lần kiểm tra sau báo đủ mọi lỗi còn lại.',
+  rejectedBody:
+    'Chỉ cần một dòng sai là cả file bị chặn. Sửa hết các lỗi dưới đây trong Excel rồi tải lại: lần kiểm tra sau báo đủ mọi lỗi còn lại.',
   uploadFixed: 'Tải file đã sửa lên',
   firstIssues: (shown: number, total: number) => `Hiển thị ${shown} trong ${total} lỗi đầu tiên.`,
   sheet: (name: string) => `Sheet “${name}”`,

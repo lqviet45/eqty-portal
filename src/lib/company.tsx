@@ -64,7 +64,15 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   if (!value) {
     return (
       <div className="mx-auto flex max-w-xl flex-col gap-4 p-6">
-        <Alert tone="warning" title={m.common.error.notFoundTitle} actions={<ButtonLink href={PICKER_PATH} variant="secondary">{m.common.nav.switchCompany}</ButtonLink>}>
+        <Alert
+          tone="warning"
+          title={m.common.error.notFoundTitle}
+          actions={
+            <ButtonLink href={PICKER_PATH} variant="secondary">
+              {m.common.nav.switchCompany}
+            </ButtonLink>
+          }
+        >
           {m.common.error.notFoundBody}
         </Alert>
       </div>
@@ -92,7 +100,11 @@ export function RoleGate({ route, children }: { route: RouteKey; children: React
     <Alert
       tone="warning"
       title={m.common.error.noAccessTitle}
-      actions={<ButtonLink href={companyHref(homeRouteOf(company.role), companyId)} variant="secondary">{m.common.action.back}</ButtonLink>}
+      actions={
+        <ButtonLink href={companyHref(homeRouteOf(company.role), companyId)} variant="secondary">
+          {m.common.action.back}
+        </ButtonLink>
+      }
     >
       {m.common.error.noAccessBody}
     </Alert>

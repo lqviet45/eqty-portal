@@ -21,9 +21,11 @@ export const capTable = {
   exportFailed: 'Không xuất được file Excel',
   price: (value: string, date: string) => `Giá gần nhất ${value}, hiệu lực ${date}`,
   noteRoundingTitle: 'Làm tròn',
-  noteRounding: 'Phần dư lớn nhất trên các dòng đang hiển thị, nên tổng luôn đúng 100,00%. Khi gộp nhóm (màn Tổng quan), một dòng có thể lệch 0,01.',
+  noteRounding:
+    'Phần dư lớn nhất trên các dòng đang hiển thị, nên tổng luôn đúng 100,00%. Khi gộp nhóm (màn Tổng quan), một dòng có thể lệch 0,01.',
   notePastTitle: 'Xem quá khứ',
-  notePast: 'Đổi ngày xem để thấy cap table tại thời điểm đó: chuyển nhượng hay phát hành có hiệu lực sau ngày xem sẽ chưa xuất hiện.',
+  notePast:
+    'Đổi ngày xem để thấy cap table tại thời điểm đó: chuyển nhượng hay phát hành có hiệu lực sau ngày xem sẽ chưa xuất hiện.',
   noteAwardsTitle: 'Quyền đã cấp',
   noteAwards: 'Gồm cả phần đã vested và chưa vested của grant đang hoạt động. Phantom không tính vào pha loãng.',
 } as const;

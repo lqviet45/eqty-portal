@@ -53,14 +53,26 @@ function CapTableView({ data }: { data: CapTableScreen }) {
             <tbody>
               {data.rows.map((row) => (
                 <tr key={`${row.kind}-${row.id}-${row.shareClassId ?? ''}`}>
-                  <td className="font-semibold whitespace-nowrap">{holderName(row, data.groupBy, t.poolUnallocated)}</td>
+                  <td className="font-semibold whitespace-nowrap">
+                    {holderName(row, data.groupBy, t.poolUnallocated)}
+                  </td>
                   {!byClass && (
-                    <td className="whitespace-nowrap text-slate-600">{row.kind === 'EQUITY_POOL' ? t.pool : row.relationship ? label(m.enums.relationship, row.relationship) : '—'}</td>
+                    <td className="whitespace-nowrap text-slate-600">
+                      {row.kind === 'EQUITY_POOL'
+                        ? t.pool
+                        : row.relationship
+                          ? label(m.enums.relationship, row.relationship)
+                          : '—'}
+                    </td>
                   )}
                   {!byClass && <td className="whitespace-nowrap text-slate-600">{row.shareClassName ?? '—'}</td>}
                   <td className="num">{formatCount(row.outstandingShares)}</td>
-                  <td className="num text-slate-600">{row.outstandingShares === 0 ? '—' : formatPercentPlain(row.outstandingPercent)}</td>
-                  <td className="num">{formatCount(row.kind === 'EQUITY_POOL' ? row.poolAvailable : row.grantedAwards)}</td>
+                  <td className="num text-slate-600">
+                    {row.outstandingShares === 0 ? '—' : formatPercentPlain(row.outstandingPercent)}
+                  </td>
+                  <td className="num">
+                    {formatCount(row.kind === 'EQUITY_POOL' ? row.poolAvailable : row.grantedAwards)}
+                  </td>
                   <td className="num">{formatInt(row.fullyDiluted)}</td>
                   <td className="num font-semibold">{formatPercentPlain(row.fullyDilutedPercent)}</td>
                 </tr>
@@ -80,7 +92,10 @@ function CapTableView({ data }: { data: CapTableScreen }) {
         </TableWrap>
       </Card>
       {data.pricePerShare && (
-        <p className="text-[13px] text-slate-600">{t.price(formatMoney(data.pricePerShare.pricePerShare), formatDate(data.pricePerShare.effectiveDate))} · {label(enums.priceSource, data.pricePerShare.source)}</p>
+        <p className="text-[13px] text-slate-600">
+          {t.price(formatMoney(data.pricePerShare.pricePerShare), formatDate(data.pricePerShare.effectiveDate))} ·{' '}
+          {label(enums.priceSource, data.pricePerShare.source)}
+        </p>
       )}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
         {[
@@ -115,7 +130,11 @@ export function CapTablePage() {
     setExporting(true);
     setExportError(null);
     try {
-      saveBlob(await download(`/api/v1/companies/${companyId}/cap-table:export`, { query: { asOfDate: asOfDate || query.data?.asOfDate, groupBy } }));
+      saveBlob(
+        await download(`/api/v1/companies/${companyId}/cap-table:export`, {
+          query: { asOfDate: asOfDate || query.data?.asOfDate, groupBy },
+        }),
+      );
     } catch (error) {
       setExportError(describeError(error).message);
     } finally {
@@ -130,7 +149,11 @@ export function CapTablePage() {
         subtitle={query.data ? m.capTable.subtitle(company.name, query.data.ledgerVersion) : company.name}
         actions={
           <>
-            <AsOfDateField label={m.common.asOfDate} value={asOfDate || query.data?.asOfDate || ''} onChange={setAsOfDate} />
+            <AsOfDateField
+              label={m.common.asOfDate}
+              value={asOfDate || query.data?.asOfDate || ''}
+              onChange={setAsOfDate}
+            />
             <Segmented
               label={m.capTable.groupLabel}
               value={groupBy}

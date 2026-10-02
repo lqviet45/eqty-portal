@@ -30,18 +30,37 @@ type Mode =
   | { action: 'CREATE_SHARE_CLASS' };
 
 /** Which write endpoint each action maps to (docs §7.11). */
-function writeTarget(companyId: string, mode: Mode, body: EquityPreviewRequest): { path: string; body: Record<string, unknown> } {
+function writeTarget(
+  companyId: string,
+  mode: Mode,
+  body: EquityPreviewRequest,
+): { path: string; body: Record<string, unknown> } {
   const base = `/api/v1/companies/${companyId}`;
   const date = body.effectiveDate;
   switch (mode.action) {
     case 'RESIZE_POOL':
       return { path: `${base}/equity-pools/${mode.pool.id}:resize`, body: { size: body.size, effectiveDate: date } };
     case 'SET_AUTHORIZED_SHARES':
-      return { path: `${base}/share-classes/${mode.shareClass.id}:setAuthorizedShares`, body: { authorizedShares: body.authorizedShares, effectiveDate: date } };
+      return {
+        path: `${base}/share-classes/${mode.shareClass.id}:setAuthorizedShares`,
+        body: { authorizedShares: body.authorizedShares, effectiveDate: date },
+      };
     case 'CREATE_POOL':
-      return { path: `${base}/equity-pools`, body: { shareClassId: body.shareClassId, name: body.name, size: body.size, effectiveDate: date } };
+      return {
+        path: `${base}/equity-pools`,
+        body: { shareClassId: body.shareClassId, name: body.name, size: body.size, effectiveDate: date },
+      };
     case 'CREATE_SHARE_CLASS':
-      return { path: `${base}/share-classes`, body: { name: body.name, kind: body.kind, votesPerShare: body.votesPerShare, authorizedShares: body.authorizedShares, effectiveDate: date } };
+      return {
+        path: `${base}/share-classes`,
+        body: {
+          name: body.name,
+          kind: body.kind,
+          votesPerShare: body.votesPerShare,
+          authorizedShares: body.authorizedShares,
+          effectiveDate: date,
+        },
+      };
   }
 }
 
@@ -55,7 +74,9 @@ function ActionForm({ mode, screen, onDone }: { mode: Mode; screen: EquityScreen
   // Today in Vietnam comes from the server (the screen's as-of date), not from the browser's UTC clock.
   const [date, setDate] = useState(screen.asOfDate);
   const [size, setSize] = useState(mode.action === 'RESIZE_POOL' ? String(mode.pool.size) : '');
-  const [authorized, setAuthorized] = useState(mode.action === 'SET_AUTHORIZED_SHARES' ? String(mode.shareClass.authorizedShares) : '');
+  const [authorized, setAuthorized] = useState(
+    mode.action === 'SET_AUTHORIZED_SHARES' ? String(mode.shareClass.authorizedShares) : '',
+  );
   const [name, setName] = useState('');
   const [shareClassId, setShareClassId] = useState('');
   const [kind, setKind] = useState<ShareClassKind>('COMMON');
@@ -63,8 +84,17 @@ function ActionForm({ mode, screen, onDone }: { mode: Mode; screen: EquityScreen
 
   const num = (text: string) => (text.trim() === '' ? null : parseWholeNumber(text));
   const local: Record<string, string> = {};
-  for (const [field, text] of [['size', size], ['authorizedShares', authorized], ['votesPerShare', votes]] as const) {
-    const relevant = field === 'size' ? mode.action === 'RESIZE_POOL' || mode.action === 'CREATE_POOL' : field === 'authorizedShares' ? mode.action === 'SET_AUTHORIZED_SHARES' || mode.action === 'CREATE_SHARE_CLASS' : mode.action === 'CREATE_SHARE_CLASS';
+  for (const [field, text] of [
+    ['size', size],
+    ['authorizedShares', authorized],
+    ['votesPerShare', votes],
+  ] as const) {
+    const relevant =
+      field === 'size'
+        ? mode.action === 'RESIZE_POOL' || mode.action === 'CREATE_POOL'
+        : field === 'authorizedShares'
+          ? mode.action === 'SET_AUTHORIZED_SHARES' || mode.action === 'CREATE_SHARE_CLASS'
+          : mode.action === 'CREATE_SHARE_CLASS';
     if (relevant && text.trim() !== '' && parseWholeNumber(text) === null) {
       local[field] = t.invalidNumber;
     }
@@ -73,16 +103,26 @@ function ActionForm({ mode, screen, onDone }: { mode: Mode; screen: EquityScreen
   const body: EquityPreviewRequest = {
     action: mode.action as EquityAction,
     poolId: mode.action === 'RESIZE_POOL' ? mode.pool.id : null,
-    shareClassId: mode.action === 'SET_AUTHORIZED_SHARES' ? mode.shareClass.id : mode.action === 'CREATE_POOL' ? shareClassId || null : null,
+    shareClassId:
+      mode.action === 'SET_AUTHORIZED_SHARES'
+        ? mode.shareClass.id
+        : mode.action === 'CREATE_POOL'
+          ? shareClassId || null
+          : null,
     name: mode.action === 'CREATE_POOL' || mode.action === 'CREATE_SHARE_CLASS' ? name.trim() || null : null,
     kind: mode.action === 'CREATE_SHARE_CLASS' ? kind : null,
     votesPerShare: mode.action === 'CREATE_SHARE_CLASS' ? num(votes) : null,
     size: mode.action === 'RESIZE_POOL' || mode.action === 'CREATE_POOL' ? num(size) : null,
-    authorizedShares: mode.action === 'SET_AUTHORIZED_SHARES' || mode.action === 'CREATE_SHARE_CLASS' ? num(authorized) : null,
+    authorizedShares:
+      mode.action === 'SET_AUTHORIZED_SHARES' || mode.action === 'CREATE_SHARE_CLASS' ? num(authorized) : null,
     effectiveDate: date || null,
   };
 
-  const check = usePreview<EquityPreviewRequest, EquityPreview>(companyId, `/bff/v1/companies/${companyId}/equity:preview`, body);
+  const check = usePreview<EquityPreviewRequest, EquityPreview>(
+    companyId,
+    `/bff/v1/companies/${companyId}/equity:preview`,
+    body,
+  );
   const server = failedFieldErrors(check.preview?.checks);
   const err = (field: string) => errorFor(field, local, write.fieldErrors, server);
 
@@ -95,9 +135,26 @@ function ActionForm({ mode, screen, onDone }: { mode: Mode; screen: EquityScreen
   }
 
   const impact = check.preview?.impact;
-  const title = { RESIZE_POOL: t.resizeTitle, SET_AUTHORIZED_SHARES: t.authorizedTitle, CREATE_POOL: t.poolTitle, CREATE_SHARE_CLASS: t.classTitle }[mode.action];
-  const hint = mode.action === 'RESIZE_POOL' ? `${mode.pool.name} · ${mode.pool.shareClassName}` : mode.action === 'SET_AUTHORIZED_SHARES' ? mode.shareClass.name : mode.action === 'CREATE_POOL' ? t.poolHint : t.classHint;
-  const submitLabel = { RESIZE_POOL: t.submitResize, SET_AUTHORIZED_SHARES: t.submitAuthorized, CREATE_POOL: t.submitPool, CREATE_SHARE_CLASS: t.submitClass }[mode.action];
+  const title = {
+    RESIZE_POOL: t.resizeTitle,
+    SET_AUTHORIZED_SHARES: t.authorizedTitle,
+    CREATE_POOL: t.poolTitle,
+    CREATE_SHARE_CLASS: t.classTitle,
+  }[mode.action];
+  const hint =
+    mode.action === 'RESIZE_POOL'
+      ? `${mode.pool.name} · ${mode.pool.shareClassName}`
+      : mode.action === 'SET_AUTHORIZED_SHARES'
+        ? mode.shareClass.name
+        : mode.action === 'CREATE_POOL'
+          ? t.poolHint
+          : t.classHint;
+  const submitLabel = {
+    RESIZE_POOL: t.submitResize,
+    SET_AUTHORIZED_SHARES: t.submitAuthorized,
+    CREATE_POOL: t.submitPool,
+    CREATE_SHARE_CLASS: t.submitClass,
+  }[mode.action];
 
   return (
     <div className="flex flex-col gap-4">
@@ -107,19 +164,38 @@ function ActionForm({ mode, screen, onDone }: { mode: Mode; screen: EquityScreen
       </div>
       <WriteError error={write.error} onReload={() => write.reset()} />
       <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4">
-        {mode.action === 'RESIZE_POOL' && <StaticValue label={t.currentSize} mono>{formatInt(mode.pool.size)}</StaticValue>}
-        {mode.action === 'SET_AUTHORIZED_SHARES' && <StaticValue label={t.currentAuthorized} mono>{formatInt(mode.shareClass.authorizedShares)}</StaticValue>}
+        {mode.action === 'RESIZE_POOL' && (
+          <StaticValue label={t.currentSize} mono>
+            {formatInt(mode.pool.size)}
+          </StaticValue>
+        )}
+        {mode.action === 'SET_AUTHORIZED_SHARES' && (
+          <StaticValue label={t.currentAuthorized} mono>
+            {formatInt(mode.shareClass.authorizedShares)}
+          </StaticValue>
+        )}
         {(mode.action === 'CREATE_POOL' || mode.action === 'CREATE_SHARE_CLASS') && (
           <Field label={mode.action === 'CREATE_POOL' ? t.poolName : t.className} error={err('name')}>
-            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={200} invalid={Boolean(err('name'))} />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={200}
+              invalid={Boolean(err('name'))}
+            />
           </Field>
         )}
         {mode.action === 'CREATE_POOL' && (
           <Field label={t.shareClass} error={err('shareClassId')}>
-            <Select value={shareClassId} onChange={(e) => setShareClassId(e.target.value)} invalid={Boolean(err('shareClassId'))}>
+            <Select
+              value={shareClassId}
+              onChange={(e) => setShareClassId(e.target.value)}
+              invalid={Boolean(err('shareClassId'))}
+            >
               <option value="">{t.pick}</option>
               {screen.shareClasses.map((c) => (
-                <option key={c.id} value={c.id}>{c.name} ({enums.shareClassKind[c.kind]})</option>
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
               ))}
             </Select>
           </Field>
@@ -129,53 +205,103 @@ function ActionForm({ mode, screen, onDone }: { mode: Mode; screen: EquityScreen
             <Field label={t.kind} error={err('kind')}>
               <Select value={kind} onChange={(e) => setKind(e.target.value as ShareClassKind)}>
                 {(Object.keys(enums.shareClassKindLong) as ShareClassKind[]).map((k) => (
-                  <option key={k} value={k}>{enums.shareClassKindLong[k]}</option>
+                  <option key={k} value={k}>
+                    {enums.shareClassKindLong[k]}
+                  </option>
                 ))}
               </Select>
             </Field>
             <Field label={t.votes} error={err('votesPerShare')}>
-              <Input numeric inputMode="numeric" value={votes} onChange={(e) => setVotes(e.target.value)} invalid={Boolean(err('votesPerShare'))} />
+              <Input
+                numeric
+                inputMode="numeric"
+                value={votes}
+                onChange={(e) => setVotes(e.target.value)}
+                invalid={Boolean(err('votesPerShare'))}
+              />
             </Field>
           </>
         )}
         {(mode.action === 'RESIZE_POOL' || mode.action === 'CREATE_POOL') && (
           <Field label={mode.action === 'RESIZE_POOL' ? t.newSize : t.colSize} error={err('size')}>
-            <Input numeric inputMode="numeric" value={size} onChange={(e) => setSize(e.target.value)} invalid={Boolean(err('size'))} />
+            <Input
+              numeric
+              inputMode="numeric"
+              value={size}
+              onChange={(e) => setSize(e.target.value)}
+              invalid={Boolean(err('size'))}
+            />
           </Field>
         )}
         {(mode.action === 'SET_AUTHORIZED_SHARES' || mode.action === 'CREATE_SHARE_CLASS') && (
-          <Field label={mode.action === 'SET_AUTHORIZED_SHARES' ? t.newAuthorized : t.authorized} error={err('authorizedShares')}>
-            <Input numeric inputMode="numeric" value={authorized} onChange={(e) => setAuthorized(e.target.value)} invalid={Boolean(err('authorizedShares'))} />
+          <Field
+            label={mode.action === 'SET_AUTHORIZED_SHARES' ? t.newAuthorized : t.authorized}
+            error={err('authorizedShares')}
+          >
+            <Input
+              numeric
+              inputMode="numeric"
+              value={authorized}
+              onChange={(e) => setAuthorized(e.target.value)}
+              invalid={Boolean(err('authorizedShares'))}
+            />
           </Field>
         )}
         <Field label={t.effectiveDate} error={err('effectiveDate')}>
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} invalid={Boolean(err('effectiveDate'))} />
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            invalid={Boolean(err('effectiveDate'))}
+          />
         </Field>
 
         <PreviewChecks bare checks={check.preview?.checks} checking={check.isChecking} />
         {impact && (
           <Note>
             <ul className="flex flex-col gap-1">
-              {impact.poolSizeBefore !== null && impact.poolSizeAfter !== null && <li>{t.impactPool(formatInt(impact.poolSizeBefore), formatInt(impact.poolSizeAfter))}</li>}
-              {impact.issuableBefore !== null && impact.issuableAfter !== null && <li>{t.impactIssuable(formatInt(impact.issuableBefore), formatInt(impact.issuableAfter))}</li>}
+              {impact.poolSizeBefore !== null && impact.poolSizeAfter !== null && (
+                <li>{t.impactPool(formatInt(impact.poolSizeBefore), formatInt(impact.poolSizeAfter))}</li>
+              )}
+              {impact.issuableBefore !== null && impact.issuableAfter !== null && (
+                <li>{t.impactIssuable(formatInt(impact.issuableBefore), formatInt(impact.issuableAfter))}</li>
+              )}
               <li>{t.impactFullyDiluted(formatInt(impact.fullyDilutedBefore), formatInt(impact.fullyDilutedAfter))}</li>
             </ul>
           </Note>
         )}
         <div className="flex gap-2.5">
-          <Button onClick={() => void submit()} loading={write.pending} disabled={!check.canSubmit || Object.keys(local).length > 0}>{submitLabel}</Button>
-          <Button variant="secondary" onClick={onDone}>{m.common.action.cancel}</Button>
+          <Button
+            onClick={() => void submit()}
+            loading={write.pending}
+            disabled={!check.canSubmit || Object.keys(local).length > 0}
+          >
+            {submitLabel}
+          </Button>
+          <Button variant="secondary" onClick={onDone}>
+            {m.common.action.cancel}
+          </Button>
         </div>
       </form>
     </div>
   );
 }
 
-function EquityView({ screen, mode, setMode }: { screen: EquityScreen; mode: Mode | null; setMode: (mode: Mode | null) => void }) {
+function EquityView({
+  screen,
+  mode,
+  setMode,
+}: {
+  screen: EquityScreen;
+  mode: Mode | null;
+  setMode: (mode: Mode | null) => void;
+}) {
   const m = useMessages();
   const t = m.equity;
   const { companyId } = useCompany();
-  const modeKey = mode ? `${mode.action}-${'pool' in mode ? mode.pool.id : 'shareClass' in mode ? mode.shareClass.id : ''}` : '';
+  const modeKey = mode
+    ? `${mode.action}-${'pool' in mode ? mode.pool.id : 'shareClass' in mode ? mode.shareClass.id : ''}`
+    : '';
 
   return (
     <div className="flex flex-wrap items-start gap-5">
@@ -207,13 +333,26 @@ function EquityView({ screen, mode, setMode }: { screen: EquityScreen; mode: Mod
                       <td className="num font-semibold">{formatInt(pool.availableQuantity)}</td>
                       <td>
                         <div className="flex min-w-[150px] items-center gap-2.5">
-                          <div className="flex-1"><ProgressBar percent={Number(pool.usedPercent)} label={`${t.colUsage} ${pool.name}`} /></div>
-                          <span className="font-mono text-[12.5px] text-slate-600">{Math.round(Number(pool.usedPercent))}%</span>
+                          <div className="flex-1">
+                            <ProgressBar percent={Number(pool.usedPercent)} label={`${t.colUsage} ${pool.name}`} />
+                          </div>
+                          <span className="font-mono text-[12.5px] text-slate-600">
+                            {Math.round(Number(pool.usedPercent))}%
+                          </span>
                         </div>
                       </td>
                       <td className="text-right whitespace-nowrap">
-                        {screen.actions.resizePool && <RowButton onClick={() => setMode({ action: 'RESIZE_POOL', pool })}>{t.adjust}</RowButton>}
-                        {screen.actions.createPool && <Link href={companyHref('newGrant', companyId, { pool: pool.id })} className="px-2 text-[13.5px] font-semibold">{t.grant}</Link>}
+                        {screen.actions.resizePool && (
+                          <RowButton onClick={() => setMode({ action: 'RESIZE_POOL', pool })}>{t.adjust}</RowButton>
+                        )}
+                        {screen.actions.createPool && (
+                          <Link
+                            href={companyHref('newGrant', companyId, { pool: pool.id })}
+                            className="px-2 text-[13.5px] font-semibold"
+                          >
+                            {t.grant}
+                          </Link>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -245,14 +384,18 @@ function EquityView({ screen, mode, setMode }: { screen: EquityScreen; mode: Mod
                   {screen.shareClasses.map((c) => (
                     <tr key={c.id}>
                       <td className="font-semibold whitespace-nowrap">{c.name}</td>
-                      <td className="text-slate-600">{label(m.enums.shareClassKind, c.kind)}</td>
+                      <td className="whitespace-nowrap text-slate-600">{label(m.enums.shareClassKind, c.kind)}</td>
                       <td className="num">{formatInt(c.votesPerShare)}</td>
                       <td className="num">{formatInt(c.authorizedShares)}</td>
                       <td className="num">{formatInt(c.outstandingShares)}</td>
                       <td className="num">{formatCount(c.reservedForPools)}</td>
                       <td className="num font-semibold">{formatInt(c.issuableShares)}</td>
                       <td className="text-right whitespace-nowrap">
-                        {screen.actions.setAuthorizedShares && <RowButton onClick={() => setMode({ action: 'SET_AUTHORIZED_SHARES', shareClass: c })}>{t.setAuthorized}</RowButton>}
+                        {screen.actions.setAuthorizedShares && (
+                          <RowButton onClick={() => setMode({ action: 'SET_AUTHORIZED_SHARES', shareClass: c })}>
+                            {t.setAuthorized}
+                          </RowButton>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -293,12 +436,24 @@ export function EquityPage() {
     <RoleGate route="equity">
       <PageHeader
         title={m.equity.title}
-        subtitle={query.data ? m.equity.subtitle(company.name, formatDate(query.data.asOfDate), query.data.company.ledgerVersion) : company.name}
+        subtitle={
+          query.data
+            ? m.equity.subtitle(company.name, formatDate(query.data.asOfDate), query.data.company.ledgerVersion)
+            : company.name
+        }
         actions={
           query.data && (
             <>
-              {query.data.actions.createShareClass && <Button variant="secondary" onClick={() => setMode({ action: 'CREATE_SHARE_CLASS' })}>{m.equity.newClass}</Button>}
-              {query.data.actions.createPool && <Button variant="secondary" onClick={() => setMode({ action: 'CREATE_POOL' })}>{m.equity.newPool}</Button>}
+              {query.data.actions.createShareClass && (
+                <Button variant="secondary" onClick={() => setMode({ action: 'CREATE_SHARE_CLASS' })}>
+                  {m.equity.newClass}
+                </Button>
+              )}
+              {query.data.actions.createPool && (
+                <Button variant="secondary" onClick={() => setMode({ action: 'CREATE_POOL' })}>
+                  {m.equity.newPool}
+                </Button>
+              )}
             </>
           )
         }

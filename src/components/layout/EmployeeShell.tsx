@@ -31,7 +31,7 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
     );
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col bg-canvas">
+    <div className="bg-canvas mx-auto flex min-h-screen max-w-2xl flex-col">
       <header className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 pt-5 pb-4">
         <div className="min-w-0">
           <Logo size={24} className="mb-2" />
@@ -47,7 +47,11 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
             <span className="truncate">{company.name}</span>
             {companies.length > 1 && <Icon name="chevronDown" size={16} className="shrink-0 text-slate-600" />}
           </Link>
-          <button type="button" onClick={() => void auth.logout()} className="text-[13px] text-slate-600 hover:text-slate-900">
+          <button
+            type="button"
+            onClick={() => void auth.logout()}
+            className="text-[13px] text-slate-600 hover:text-slate-900"
+          >
             {m.common.nav.signOut}
           </button>
         </div>
@@ -55,12 +59,23 @@ export function EmployeeShell({ children }: { children: ReactNode }) {
 
       <main className="flex-1 px-4 py-4 pb-24">{children}</main>
 
-      <nav aria-label={m.common.nav.label} className="fixed inset-x-0 bottom-0 z-20 mx-auto grid max-w-2xl grid-cols-3 border-t border-slate-200 bg-white px-2 pb-3">
-        <Link href={companyHref('portfolio', companyId)} className={tab(view !== 'schedule')} aria-current={view !== 'schedule' ? 'page' : undefined}>
+      <nav
+        aria-label={m.common.nav.label}
+        className="fixed inset-x-0 bottom-0 z-20 mx-auto grid max-w-2xl grid-cols-3 border-t border-slate-200 bg-white px-2 pb-3"
+      >
+        <Link
+          href={companyHref('portfolio', companyId)}
+          className={tab(view !== 'schedule')}
+          aria-current={view !== 'schedule' ? 'page' : undefined}
+        >
           <Icon name="home" size={22} />
           {m.employee.tabOverview}
         </Link>
-        <Link href={companyHref('portfolio', companyId, { v: 'schedule' })} className={tab(view === 'schedule')} aria-current={view === 'schedule' ? 'page' : undefined}>
+        <Link
+          href={companyHref('portfolio', companyId, { v: 'schedule' })}
+          className={tab(view === 'schedule')}
+          aria-current={view === 'schedule' ? 'page' : undefined}
+        >
           <Icon name="calendar" size={22} />
           {m.employee.tabSchedule}
         </Link>

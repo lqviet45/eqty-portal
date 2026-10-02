@@ -25,7 +25,10 @@ export function formatSignedInt(value: number): string {
 const DECIMAL_STRING = /^(-?)(\d+)(?:\.(\d+))?$/;
 
 /** "25000.50" → "25.000,50" (keeps the fraction exactly as given). */
-export function formatDecimalString(value: string, options: { trimZeros?: boolean; minFraction?: number } = {}): string {
+export function formatDecimalString(
+  value: string,
+  options: { trimZeros?: boolean; minFraction?: number } = {},
+): string {
   const match = DECIMAL_STRING.exec(value.trim());
   if (!match) {
     return value;

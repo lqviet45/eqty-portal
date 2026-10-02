@@ -26,7 +26,9 @@ function InviteForm({ data }: { data: Members }) {
   const toast = useToast();
   const write = useWrite(companyId);
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<CompanyRole>(data.invitableRoles.includes('EMPLOYEE') ? 'EMPLOYEE' : (data.invitableRoles[0] ?? 'VIEWER'));
+  const [role, setRole] = useState<CompanyRole>(
+    data.invitableRoles.includes('EMPLOYEE') ? 'EMPLOYEE' : (data.invitableRoles[0] ?? 'VIEWER'),
+  );
   const [stakeholderId, setStakeholderId] = useState('');
   const isEmployee = role === 'EMPLOYEE';
 
@@ -45,7 +47,13 @@ function InviteForm({ data }: { data: Members }) {
       <h2 className="text-[17px] font-bold">{t.inviteTitle}</h2>
       <WriteError error={write.error} />
       <Field label={t.email} error={write.fieldErrors.email}>
-        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required invalid={Boolean(write.fieldErrors.email)} />
+        <Input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          invalid={Boolean(write.fieldErrors.email)}
+        />
       </Field>
       <Field label={t.role} error={write.fieldErrors.role}>
         <Select value={role} onChange={(e) => setRole(e.target.value as CompanyRole)}>
@@ -56,16 +64,30 @@ function InviteForm({ data }: { data: Members }) {
       </Field>
       {isEmployee && (
         <Field label={t.stakeholder} error={write.fieldErrors.stakeholderId}>
-          <Select value={stakeholderId} onChange={(e) => setStakeholderId(e.target.value)} required invalid={Boolean(write.fieldErrors.stakeholderId)}>
+          <Select
+            value={stakeholderId}
+            onChange={(e) => setStakeholderId(e.target.value)}
+            required
+            invalid={Boolean(write.fieldErrors.stakeholderId)}
+          >
             <option value="">{t.stakeholderNone}</option>
             {data.linkableStakeholders.map((s) => (
-              <option key={s.id} value={s.id}>{s.displayName}{s.email ? ` (${s.email})` : ''}</option>
+              <option key={s.id} value={s.id}>
+                {s.displayName}
+                {s.email ? ` (${s.email})` : ''}
+              </option>
             ))}
           </Select>
         </Field>
       )}
       {isEmployee && <Note>{data.linkableStakeholders.length === 0 ? t.noLinkable : t.stakeholderNote}</Note>}
-      <Button type="submit" loading={write.pending} disabled={email.trim() === '' || (isEmployee && stakeholderId === '')}>{t.send}</Button>
+      <Button
+        type="submit"
+        loading={write.pending}
+        disabled={email.trim() === '' || (isEmployee && stakeholderId === '')}
+      >
+        {t.send}
+      </Button>
       <div className="text-[12.5px] text-slate-500">{t.roleHint}</div>
     </form>
   );
@@ -80,11 +102,28 @@ function RoleForm({ member, data, onDone }: { member: MemberRow; data: Members; 
   const [role, setRole] = useState(member.role);
   const [stakeholderId, setStakeholderId] = useState(member.stakeholderId ?? '');
   const isEmployee = role === 'EMPLOYEE';
-  const options = [...data.linkableStakeholders, ...(member.stakeholderId && !data.linkableStakeholders.some((s) => s.id === member.stakeholderId) ? [{ id: member.stakeholderId, displayName: member.stakeholderName ?? member.stakeholderId, email: null, relationship: 'EMPLOYEE' as const }] : [])];
+  const options = [
+    ...data.linkableStakeholders,
+    ...(member.stakeholderId && !data.linkableStakeholders.some((s) => s.id === member.stakeholderId)
+      ? [
+          {
+            id: member.stakeholderId,
+            displayName: member.stakeholderName ?? member.stakeholderId,
+            email: null,
+            relationship: 'EMPLOYEE' as const,
+          },
+        ]
+      : []),
+  ];
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (await write.run(`/api/v1/companies/${companyId}/members/${member.userId}:changeRole`, { role, stakeholderId: isEmployee ? stakeholderId || null : null })) {
+    if (
+      await write.run(`/api/v1/companies/${companyId}/members/${member.userId}:changeRole`, {
+        role,
+        stakeholderId: isEmployee ? stakeholderId || null : null,
+      })
+    ) {
       toast.success(t.roleChanged);
       onDone();
     }
@@ -100,7 +139,9 @@ function RoleForm({ member, data, onDone }: { member: MemberRow; data: Members; 
       <Field label={t.newRole} error={write.fieldErrors.role}>
         <Select value={role} onChange={(e) => setRole(e.target.value as CompanyRole)}>
           {data.assignableRoles.map((r) => (
-            <option key={r} value={r}>{enums.role[r]}</option>
+            <option key={r} value={r}>
+              {enums.role[r]}
+            </option>
           ))}
         </Select>
       </Field>
@@ -109,14 +150,20 @@ function RoleForm({ member, data, onDone }: { member: MemberRow; data: Members; 
           <Select value={stakeholderId} onChange={(e) => setStakeholderId(e.target.value)} required>
             <option value="">{t.stakeholderNone}</option>
             {options.map((s) => (
-              <option key={s.id} value={s.id}>{s.displayName}</option>
+              <option key={s.id} value={s.id}>
+                {s.displayName}
+              </option>
             ))}
           </Select>
         </Field>
       )}
       <div className="flex gap-2.5">
-        <Button type="submit" loading={write.pending} disabled={isEmployee && stakeholderId === ''}>{t.saveRole}</Button>
-        <Button variant="secondary" onClick={onDone}>{m.common.action.cancel}</Button>
+        <Button type="submit" loading={write.pending} disabled={isEmployee && stakeholderId === ''}>
+          {t.saveRole}
+        </Button>
+        <Button variant="secondary" onClick={onDone}>
+          {m.common.action.cancel}
+        </Button>
       </div>
     </form>
   );
@@ -177,12 +224,20 @@ export function MembersPage() {
                             <div className="font-semibold">{member.displayName}</div>
                             <div className="text-[13px] text-slate-600">{member.email}</div>
                           </td>
-                          <td><Badge>{label(m.enums.role, member.role)}</Badge></td>
+                          <td>
+                            <Badge>{label(m.enums.role, member.role)}</Badge>
+                          </td>
                           <td className="text-slate-600">{member.stakeholderName ?? '—'}</td>
                           <td className="text-right whitespace-nowrap">
                             {member.isYou && <span className="text-[13px] text-slate-500">{t.you}</span>}
-                            {member.actions.changeRole && <RowButton onClick={() => setPanel({ mode: 'role', member })}>{t.changeRole}</RowButton>}
-                            {member.actions.revoke && <RowButton tone="danger" onClick={() => setConfirm({ kind: 'member', member })}>{m.common.action.revoke}</RowButton>}
+                            {member.actions.changeRole && (
+                              <RowButton onClick={() => setPanel({ mode: 'role', member })}>{t.changeRole}</RowButton>
+                            )}
+                            {member.actions.revoke && (
+                              <RowButton tone="danger" onClick={() => setConfirm({ kind: 'member', member })}>
+                                {m.common.action.revoke}
+                              </RowButton>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -192,25 +247,41 @@ export function MembersPage() {
               </Card>
 
               <Card className="overflow-hidden">
-                <div className="border-b border-slate-200 px-5 py-3.5 font-bold">{t.pendingTitle(data.invitations.length)}</div>
+                <div className="border-b border-slate-200 px-5 py-3.5 font-bold">
+                  {t.pendingTitle(data.invitations.length)}
+                </div>
                 {data.invitations.length === 0 ? (
                   <p className="px-5 py-6 text-sm text-slate-600">{t.pendingEmpty}</p>
                 ) : (
                   <ul>
                     {data.invitations.map((invitation) => (
-                      <li key={invitation.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-slate-100 px-5 py-3.5 last:border-b-0">
+                      <li
+                        key={invitation.id}
+                        className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-slate-100 px-5 py-3.5 last:border-b-0"
+                      >
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2 font-semibold">
                             <span className="truncate">{invitation.email}</span>
                             {invitation.status === 'EXPIRED' && <Badge tone="warning">{t.expired}</Badge>}
                           </div>
                           <div className="text-[13px] text-slate-600">
-                            {t.pendingDetail(label(m.enums.role, invitation.role), invitation.stakeholderName, formatInstantDate(invitation.createdAt), formatInstantDate(invitation.expiresAt))}
+                            {t.pendingDetail(
+                              label(m.enums.role, invitation.role),
+                              invitation.stakeholderName,
+                              formatInstantDate(invitation.createdAt),
+                              formatInstantDate(invitation.expiresAt),
+                            )}
                           </div>
                         </div>
                         <div className="whitespace-nowrap">
-                          {invitation.actions.resend && <RowButton onClick={() => void resend(invitation)}>{m.common.action.resend}</RowButton>}
-                          {invitation.actions.revoke && <RowButton tone="danger" onClick={() => setConfirm({ kind: 'invitation', invitation })}>{m.common.action.revoke}</RowButton>}
+                          {invitation.actions.resend && (
+                            <RowButton onClick={() => void resend(invitation)}>{m.common.action.resend}</RowButton>
+                          )}
+                          {invitation.actions.revoke && (
+                            <RowButton tone="danger" onClick={() => setConfirm({ kind: 'invitation', invitation })}>
+                              {m.common.action.revoke}
+                            </RowButton>
+                          )}
                         </div>
                       </li>
                     ))}
@@ -220,7 +291,16 @@ export function MembersPage() {
             </div>
 
             <Card className="min-w-[300px] flex-[1_1_320px] px-6 py-5">
-              {panel.mode === 'invite' ? <InviteForm data={data} /> : <RoleForm key={panel.member.userId} member={panel.member} data={data} onDone={() => setPanel({ mode: 'invite' })} />}
+              {panel.mode === 'invite' ? (
+                <InviteForm data={data} />
+              ) : (
+                <RoleForm
+                  key={panel.member.userId}
+                  member={panel.member}
+                  data={data}
+                  onDone={() => setPanel({ mode: 'invite' })}
+                />
+              )}
             </Card>
           </div>
         )}
@@ -235,7 +315,11 @@ export function MembersPage() {
         onConfirm={() => void confirmRevoke()}
         onCancel={() => setConfirm(null)}
       >
-        {confirm?.kind === 'member' ? t.revokeBody(confirm.member.displayName) : confirm?.kind === 'invitation' ? t.revokeInvitationBody(confirm.invitation.email) : null}
+        {confirm?.kind === 'member'
+          ? t.revokeBody(confirm.member.displayName)
+          : confirm?.kind === 'invitation'
+            ? t.revokeInvitationBody(confirm.invitation.email)
+            : null}
       </ConfirmDialog>
     </RoleGate>
   );

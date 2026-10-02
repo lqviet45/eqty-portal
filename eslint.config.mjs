@@ -9,9 +9,15 @@ export default defineConfig([
   {
     rules: {
       // Money, percentages and quantities are formatted from strings; never coerce with a bare Number(...) for display math.
-      'no-restricted-globals': ['error', { name: 'parseFloat', message: 'Money and percentages are strings; use lib/format.' }],
+      'no-restricted-globals': [
+        'error',
+        { name: 'parseFloat', message: 'Money and percentages are strings; use lib/format.' },
+      ],
       '@typescript-eslint/no-non-null-assertion': 'error',
-      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports', fixStyle: 'inline-type-imports' }],
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
+      ],
     },
   },
 ]);

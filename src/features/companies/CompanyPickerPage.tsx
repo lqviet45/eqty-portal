@@ -26,16 +26,22 @@ function CompanyCard({ company }: { company: PickerCompany }) {
   const m = useMessages();
   const line =
     company.stakeholderCount !== null
-      ? m.companies.stakeholderLine(company.stakeholderCount, company.lastRecordedAt ? formatInstantDate(company.lastRecordedAt) : '')
+      ? m.companies.stakeholderLine(
+          company.stakeholderCount,
+          company.lastRecordedAt ? formatInstantDate(company.lastRecordedAt) : '',
+        )
       : company.myGrantCount !== null
         ? m.companies.grantLine(company.myGrantCount)
         : '';
   return (
     <Link
       href={companyHref(homeRouteOf(company.role), company.companyId)}
-      className="grid grid-cols-[48px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-5 text-slate-900 hover:border-brand hover:text-slate-900"
+      className="hover:border-brand grid grid-cols-[48px_minmax(0,1fr)_auto] items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-5 text-slate-900 hover:text-slate-900"
     >
-      <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-[10px] bg-brand-tint text-lg font-bold text-brand-strong">
+      <span
+        aria-hidden="true"
+        className="bg-brand-tint text-brand-strong flex size-12 items-center justify-center rounded-[10px] text-lg font-bold"
+      >
         {initials(company.name)}
       </span>
       <span className="min-w-0">
@@ -92,14 +98,18 @@ function Picker() {
               <>
                 <div className="flex flex-col gap-1.5">
                   <h1 className="text-3xl font-bold">{m.companies.pickerTitle}</h1>
-                  <p className="text-slate-600">{data.companies.length > 0 ? m.companies.pickerIntro(data.companies.length) : m.companies.pickerEmpty}</p>
+                  <p className="text-slate-600">
+                    {data.companies.length > 0
+                      ? m.companies.pickerIntro(data.companies.length)
+                      : m.companies.pickerEmpty}
+                  </p>
                 </div>
                 {data.companies.map((company) => (
                   <CompanyCard key={company.companyId} company={company} />
                 ))}
                 <Link
                   href={NEW_COMPANY_PATH}
-                  className="flex h-14 items-center justify-center gap-2.5 rounded-xl border border-dashed border-slate-400 font-semibold text-slate-900 hover:border-brand hover:text-slate-900"
+                  className="hover:border-brand flex h-14 items-center justify-center gap-2.5 rounded-xl border border-dashed border-slate-400 font-semibold text-slate-900 hover:text-slate-900"
                 >
                   <Icon name="plus" size={18} />
                   {m.companies.create}

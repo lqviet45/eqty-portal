@@ -47,15 +47,37 @@ function SettingsForm({ company }: { company: Company }) {
           </div>
           <WriteError error={write.error} />
           <Field label={t.name} error={write.fieldErrors.name}>
-            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={200} required invalid={Boolean(write.fieldErrors.name)} />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={200}
+              required
+              invalid={Boolean(write.fieldErrors.name)}
+            />
           </Field>
           <Field label={t.incorporationDate} hint={t.incorporationHint} error={write.fieldErrors.incorporationDate}>
-            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} invalid={Boolean(write.fieldErrors.incorporationDate)} />
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              invalid={Boolean(write.fieldErrors.incorporationDate)}
+            />
           </Field>
           <Note>{t.note}</Note>
           <div className="flex flex-wrap gap-2.5">
-            <Button type="submit" loading={write.pending} disabled={!dirty || name.trim() === ''}>{m.common.action.save}</Button>
-            <Button variant="secondary" disabled={!dirty} onClick={() => { setName(company.name); setDate(company.incorporationDate ?? ''); }}>{t.undo}</Button>
+            <Button type="submit" loading={write.pending} disabled={!dirty || name.trim() === ''}>
+              {m.common.action.save}
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={!dirty}
+              onClick={() => {
+                setName(company.name);
+                setDate(company.incorporationDate ?? '');
+              }}
+            >
+              {t.undo}
+            </Button>
           </div>
         </form>
       </Card>
@@ -79,8 +101,12 @@ function SettingsForm({ company }: { company: Company }) {
         </Card>
         <Card className="flex flex-col gap-2.5 px-7 py-5">
           <h2 className="text-base font-bold">{t.othersTitle}</h2>
-          <Link href={companyHref('members', companyId)} className="font-semibold">{t.linkMembers}</Link>
-          <Link href={companyHref('equity', companyId)} className="font-semibold">{t.linkEquity}</Link>
+          <Link href={companyHref('members', companyId)} className="font-semibold">
+            {t.linkMembers}
+          </Link>
+          <Link href={companyHref('equity', companyId)} className="font-semibold">
+            {t.linkEquity}
+          </Link>
         </Card>
       </div>
     </div>
@@ -94,7 +120,9 @@ export function SettingsPage() {
   return (
     <RoleGate route="settings">
       <PageHeader title={m.settings.title} subtitle={m.settings.subtitle(company.name)} />
-      <Async query={query}>{(data) => <SettingsForm key={`${data.name}-${data.incorporationDate}`} company={data} />}</Async>
+      <Async query={query}>
+        {(data) => <SettingsForm key={`${data.name}-${data.incorporationDate}`} company={data} />}
+      </Async>
     </RoleGate>
   );
 }

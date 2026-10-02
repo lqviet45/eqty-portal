@@ -7,6 +7,8 @@ const apiOrigin = process.env.EQTY_API_ORIGIN ?? 'http://localhost:5270';
 
 const config: NextConfig = {
   reactStrictMode: true,
+  // CLAUDE.md is maintained by hand (conventions of this repo); don't let `next dev` generate one.
+  agentRules: false,
   trailingSlash: true,
   images: { unoptimized: true },
   ...(isProduction

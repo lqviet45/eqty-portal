@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 
 export function FullScreen({ children }: { children: ReactNode }) {
-  return <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-slate-600">{children}</div>;
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-slate-600">{children}</div>
+  );
 }
 
 /** Sends visitors who are not signed in to Keycloak and renders its children only once they are. */

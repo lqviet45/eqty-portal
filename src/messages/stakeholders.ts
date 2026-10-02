@@ -32,8 +32,10 @@ export const stakeholders = {
   emailPlaceholder: 'ten@congty.vn',
   relationship: 'Quan hệ với công ty',
   kindFixed: (kind: string) => `${kind} · không đổi được`,
-  addNote: 'Loại không đổi được sau khi tạo. Thêm cổ đông chưa ghi cổ phần nào: phát hành hoặc chuyển nhượng ở màn Giao dịch.',
-  editNote: 'Đổi tên hoặc email chỉ đổi hồ sơ, không đổi số liệu sổ cái. Tài khoản đã liên kết giữ nguyên. Mỗi lần lưu được ghi vào lịch sử; lưu mà không đổi gì thì không ghi.',
+  addNote:
+    'Loại không đổi được sau khi tạo. Thêm cổ đông chưa ghi cổ phần nào: phát hành hoặc chuyển nhượng ở màn Giao dịch.',
+  editNote:
+    'Đổi tên hoặc email chỉ đổi hồ sơ, không đổi số liệu sổ cái. Tài khoản đã liên kết giữ nguyên. Mỗi lần lưu được ghi vào lịch sử; lưu mà không đổi gì thì không ghi.',
   addAnother: 'Thêm người khác',
   added: (name: string) => `Đã thêm ${name}.`,
   saved: 'Đã lưu hồ sơ.',
@@ -43,9 +45,11 @@ export const stakeholders = {
   impactTitle: 'Tác động khi xác nhận',
   impactEmpty: 'Chọn loại và ngày nghỉ việc để xem tác động.',
   impactGrant: (award: string, quantity: string) => `Grant ${quantity} ${award}: vesting dừng từ ngày nghỉ việc`,
-  impactVested: (vested: string, forfeited: string, pool: string) => `Đã vested ${vested} · chưa vested ${forfeited}${pool ? ` trả về ${pool}` : ''}`,
+  impactVested: (vested: string, forfeited: string, pool: string) =>
+    `Đã vested ${vested} · chưa vested ${forfeited}${pool ? ` trả về ${pool}` : ''}`,
   impactDeadline: (date: string) => `Hạn thực hiện option: ${date}`,
-  impactTotals: (vested: string, forfeited: string, returned: string) => `Tổng: vested ${vested} · thu hồi ${forfeited} · trả về quỹ ${returned}`,
+  impactTotals: (vested: string, forfeited: string, returned: string) =>
+    `Tổng: vested ${vested} · thu hồi ${forfeited} · trả về quỹ ${returned}`,
   terminateNote: 'Không có nút hoàn tác. Nếu ghi nhầm, đảo các bút toán liên quan ở Nhật ký sổ cái.',
   confirmTerminate: 'Xác nhận nghỉ việc',
   terminated: (name: string) => `Đã ghi nhận ${name} nghỉ việc.`,

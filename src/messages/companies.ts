@@ -7,7 +7,8 @@ export const companies = {
   create: 'Tạo công ty mới',
   open: (name: string) => `Mở ${name}`,
   newTitle: 'Tạo công ty mới',
-  newIntro: 'Bạn sẽ là Owner của công ty này. Loại hình và tiền tệ quyết định cách đọc mọi số lượng và giá trong sổ cái nên không đổi được sau khi tạo.',
+  newIntro:
+    'Bạn sẽ là Owner của công ty này. Loại hình và tiền tệ quyết định cách đọc mọi số lượng và giá trong sổ cái nên không đổi được sau khi tạo.',
   name: 'Tên công ty',
   entityType: 'Loại hình',
   currency: 'Tiền tệ',
